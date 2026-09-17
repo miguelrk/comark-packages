@@ -17,11 +17,16 @@ Comark plugins and renderers. [Playgrounds](https://miguelrk.github.io/comark-pa
 
 ## Development
 
+### Root
+
 - `pnpm install`
 - `pnpm build`
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm generate`
+
+### Package
+
 - `pnpm --dir packages/<package> build`
 - `pnpm --dir packages/<package> dev`
 - `pnpm --dir packages/<package> play`
@@ -31,6 +36,9 @@ Comark plugins and renderers. [Playgrounds](https://miguelrk.github.io/comark-pa
 - `pnpm --dir packages/<package> test`
 - `pnpm --dir packages/<package> test:watch`
 - `pnpm --dir packages/<package> typecheck`
+
+### Playground
+
 - `pnpm --dir packages/<package>/playground dev`
 - `pnpm --dir packages/<package>/playground build`
 - `pnpm --dir packages/<package>/playground generate`
