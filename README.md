@@ -4,18 +4,24 @@ Comark plugins and renderers.
 
 ## Packages
 
-| Package | Kind | Description |
-| --- | --- | --- |
-| [`comark-arrow`](https://miguelrk.github.io/comark-arrow/) | plugin | ArrowJS sandboxed widgets |
-| [`comark-etiket`](https://miguelrk.github.io/comark-etiket/) | plugin | Barcode and QR codes via etiket |
-| [`comark-fetch`](https://miguelrk.github.io/comark-fetch/) | plugin | Frontmatter fetch into meta |
-| [`comark-flint`](https://miguelrk.github.io/comark-flint/) | plugin | Flint charts (Vega-Lite / ECharts) |
-| [`comark-kv`](https://miguelrk.github.io/comark-kv/) | plugin | unstorage-backed key-value model |
-| [`comark-vega`](https://miguelrk.github.io/comark-vega/) | plugin | Vega and Vega-Lite charts |
-| [`comark-email`](https://miguelrk.github.io/comark-email/) | renderer | Email HTML via MJML |
-| [`comark-pdf`](https://miguelrk.github.io/comark-pdf/) | renderer | PDF output via jasy |
+
+| Package                                                      | Kind     | Status      | Description                        |
+| ------------------------------------------------------------ | -------- | ----------- | ---------------------------------- |
+| `[comark-arrow](https://miguelrk.github.io/comark-arrow/)`   | plugin   | done        | ArrowJS sandboxed widgets          |
+| `[comark-etiket](https://miguelrk.github.io/comark-etiket/)` | plugin   | done        | Barcode and QR codes via etiket    |
+| `[comark-fetch](https://miguelrk.github.io/comark-fetch/)`   | plugin   | done        | Frontmatter fetch into meta        |
+| `[comark-flint](https://miguelrk.github.io/comark-flint/)`   | plugin   | done        | Flint charts (Vega-Lite / ECharts) |
+| `[comark-kv](https://miguelrk.github.io/comark-kv/)`         | plugin   | in-progress | unstorage-backed key-value model   |
+| `[comark-vega](https://miguelrk.github.io/comark-vega/)`     | plugin   | done        | Vega and Vega-Lite charts          |
+| `[comark-email](https://miguelrk.github.io/comark-email/)`   | renderer | done        | Email HTML via MJML                |
+| `[comark-pdf](https://miguelrk.github.io/comark-pdf/)`       | renderer | done        | PDF output via jasy                |
+
+
+
 
 ## Development
+
+
 
 ### Root
 
@@ -24,6 +30,8 @@ Comark plugins and renderers.
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm generate`
+
+
 
 ### Package
 
@@ -37,6 +45,8 @@ Comark plugins and renderers.
 - `pnpm --dir packages/<package> test:watch`
 - `pnpm --dir packages/<package> typecheck`
 
+
+
 ### Playground
 
 - `pnpm --dir packages/<package>/playground dev`
@@ -44,3 +54,4 @@ Comark plugins and renderers.
 - `pnpm --dir packages/<package>/playground generate`
 - `pnpm --dir packages/<package>/playground preview`
 - `pnpm --dir packages/<package>/playground og:generate`
+
