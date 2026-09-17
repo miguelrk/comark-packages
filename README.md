@@ -7,14 +7,14 @@ Comark plugins and renderers.
 
 | Package                                                      | Kind     | Status      | Description                        |
 | ------------------------------------------------------------ | -------- | ----------- | ---------------------------------- |
-| `[comark-arrow](https://miguelrk.github.io/comark-packages/comark-arrow/)`   | plugin   | done        | ArrowJS sandboxed widgets          |
-| `[comark-etiket](https://miguelrk.github.io/comark-packages/comark-etiket/)` | plugin   | done        | Barcode and QR codes via etiket    |
-| `[comark-fetch](https://miguelrk.github.io/comark-packages/comark-fetch/)`   | plugin   | done        | Frontmatter fetch into meta        |
-| `[comark-flint](https://miguelrk.github.io/comark-packages/comark-flint/)`   | plugin   | done        | Flint charts (Vega-Lite / ECharts) |
-| `[comark-kv](https://miguelrk.github.io/comark-packages/comark-kv/)`         | plugin   | in-progress | unstorage-backed key-value model   |
-| `[comark-vega](https://miguelrk.github.io/comark-packages/comark-vega/)`     | plugin   | done        | Vega and Vega-Lite charts          |
-| `[comark-email](https://miguelrk.github.io/comark-packages/comark-email/)`   | renderer | done        | Email HTML via MJML                |
-| `[comark-pdf](https://miguelrk.github.io/comark-packages/comark-pdf/)`       | renderer | done        | PDF output via jasy                |
+| [`comark-arrow`](https://miguelrk.github.io/comark-packages/comark-arrow/)   | plugin   | done        | ArrowJS sandboxed widgets          |
+| [`comark-etiket`](https://miguelrk.github.io/comark-packages/comark-etiket/) | plugin   | done        | Barcode and QR codes via etiket    |
+| [`comark-fetch`](https://miguelrk.github.io/comark-packages/comark-fetch/)   | plugin   | done        | Frontmatter fetch into meta        |
+| [`comark-flint`](https://miguelrk.github.io/comark-packages/comark-flint/)   | plugin   | done        | Flint charts (Vega-Lite / ECharts) |
+| [`comark-kv`](https://miguelrk.github.io/comark-packages/comark-kv/)         | plugin   | in-progress | unstorage-backed key-value model   |
+| [`comark-vega`](https://miguelrk.github.io/comark-packages/comark-vega/)     | plugin   | done        | Vega and Vega-Lite charts          |
+| [`comark-email`](https://miguelrk.github.io/comark-packages/comark-email/)   | renderer | done        | Email HTML via MJML                |
+| [`comark-pdf`](https://miguelrk.github.io/comark-packages/comark-pdf/)       | renderer | done        | PDF output via jasy                |
 
 
 
