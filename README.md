@@ -4,7 +4,6 @@ Comark plugins and renderers.
 
 ## Packages
 
-
 | Package                                                      | Kind     | Status      | Description                        |
 | ------------------------------------------------------------ | -------- | ----------- | ---------------------------------- |
 | [`comark-arrow`](https://miguelrk.github.io/comark-packages/comark-arrow/)   | plugin   | done        | ArrowJS sandboxed widgets          |
@@ -16,12 +15,19 @@ Comark plugins and renderers.
 | [`comark-email`](https://miguelrk.github.io/comark-packages/comark-email/)   | renderer | done        | Email HTML via MJML                |
 | [`comark-pdf`](https://miguelrk.github.io/comark-packages/comark-pdf/)       | renderer | done        | PDF output via jasy                |
 
+## Install (from GitHub)
 
+```bash
+pnpm add "comark-fetch@github:miguelrk/comark-packages#path:/packages/comark-fetch"
+pnpm add "comark-fetch@github:miguelrk/comark-packages#main&path:/packages/comark-fetch"
+```
 
+Replace `comark-fetch` and the `path:` folder with the package you want.
+
+> [!NOTE]
+> The `github:…#path:` specifier works with pnpm only.
 
 ## Development
-
-
 
 ### Root
 
@@ -30,8 +36,6 @@ Comark plugins and renderers.
 - `pnpm test`
 - `pnpm typecheck`
 - `pnpm generate`
-
-
 
 ### Package
 
@@ -45,8 +49,6 @@ Comark plugins and renderers.
 - `pnpm --dir packages/<package> test:watch`
 - `pnpm --dir packages/<package> typecheck`
 
-
-
 ### Playground
 
 - `pnpm --dir packages/<package>/playground dev`
@@ -54,4 +56,3 @@ Comark plugins and renderers.
 - `pnpm --dir packages/<package>/playground generate`
 - `pnpm --dir packages/<package>/playground preview`
 - `pnpm --dir packages/<package>/playground og:generate`
-
