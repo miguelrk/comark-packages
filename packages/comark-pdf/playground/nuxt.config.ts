@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-pdf',
+      siteUrl: 'https://miguelrk.github.io/comark-pdf',
     },
   },
   app: {

@@ -1,19 +1,19 @@
 # comark-packages
 
-Comark plugins and renderers. [Playgrounds](https://miguelrk.github.io/comark-packages/).
+Comark plugins and renderers.
 
 ## Packages
 
 | Package | Kind | Description |
 | --- | --- | --- |
-| [`comark-arrow`](https://miguelrk.github.io/comark-packages/comark-arrow/) | plugin | ArrowJS sandboxed widgets |
-| [`comark-etiket`](https://miguelrk.github.io/comark-packages/comark-etiket/) | plugin | Barcode and QR codes via etiket |
-| [`comark-fetch`](https://miguelrk.github.io/comark-packages/comark-fetch/) | plugin | Frontmatter fetch into meta |
-| [`comark-flint`](https://miguelrk.github.io/comark-packages/comark-flint/) | plugin | Flint charts (Vega-Lite / ECharts) |
-| [`comark-kv`](https://miguelrk.github.io/comark-packages/comark-kv/) | plugin | unstorage-backed key-value model |
-| [`comark-vega`](https://miguelrk.github.io/comark-packages/comark-vega/) | plugin | Vega and Vega-Lite charts |
-| [`comark-email`](https://miguelrk.github.io/comark-packages/comark-email/) | renderer | Email HTML via MJML |
-| [`comark-pdf`](https://miguelrk.github.io/comark-packages/comark-pdf/) | renderer | PDF output via jasy |
+| [`comark-arrow`](https://miguelrk.github.io/comark-arrow/) | plugin | ArrowJS sandboxed widgets |
+| [`comark-etiket`](https://miguelrk.github.io/comark-etiket/) | plugin | Barcode and QR codes via etiket |
+| [`comark-fetch`](https://miguelrk.github.io/comark-fetch/) | plugin | Frontmatter fetch into meta |
+| [`comark-flint`](https://miguelrk.github.io/comark-flint/) | plugin | Flint charts (Vega-Lite / ECharts) |
+| [`comark-kv`](https://miguelrk.github.io/comark-kv/) | plugin | unstorage-backed key-value model |
+| [`comark-vega`](https://miguelrk.github.io/comark-vega/) | plugin | Vega and Vega-Lite charts |
+| [`comark-email`](https://miguelrk.github.io/comark-email/) | renderer | Email HTML via MJML |
+| [`comark-pdf`](https://miguelrk.github.io/comark-pdf/) | renderer | PDF output via jasy |
 
 ## Development
 
