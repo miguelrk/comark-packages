@@ -1,0 +1,26 @@
+packages:
+  - 'packages/plugins/*'
+  - 'packages/renderers/*'
+  - 'packages/plugins/*/playground'
+  - 'packages/renderers/*/playground'
+
+catalog:
+  typescript: ^5.7.0
+  vitest: ^4.1.4
+  tsdown: ^0.22.3
+  tsx: ^4.22.4
+  release-it: ^21.0.3
+  '@types/node': ^22.10.0
+  comark: ^0.7.0
+  '@comark/nuxt': ^0.7.0
+  '@comark/html': ^0.7.0
+  '@comark/vue': ^0.7.0
+  vue: ^3.5.0
+  '@vue/test-utils': ^2.4.6
+  nuxt: ^4.5.2
+  rangi: ^2.2.0
+  htmlparser2: ^12.0.0
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true

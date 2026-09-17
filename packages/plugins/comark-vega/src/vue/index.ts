@@ -1,0 +1,5 @@
+export { default, coerceValue, svgToNodes } from '../index.ts'
+export type { ChartEngine, VegaConfig, VegaNodeAttrs, VegaOutput } from '../index.ts'
+export { Vega } from './Vega.ts'
+export { mountVegaView } from '../mountView.ts'
+export type { MountVegaViewOptions, MountedVegaView } from '../mountView.ts'

@@ -1,0 +1,139 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fff;
+  --fg: #111;
+  --muted: #666;
+  --border: #ddd;
+  --surface: #f6f6f6;
+  --accent: #b59a00;
+  --error: #c33;
+  --tip: #0a7;
+  --warning: #d80;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111;
+    --fg: #eee;
+    --muted: #999;
+    --border: #333;
+    --surface: #1a1a1a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+code,
+pre {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+a {
+  color: inherit;
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.masthead .brand {
+  font-weight: 700;
+  text-decoration: none;
+}
+.masthead .tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+.masthead .tabs a {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.masthead .tabs a.active {
+  color: var(--fg);
+  background: var(--surface);
+  border-color: var(--border);
+}
+.masthead .links {
+  margin-left: auto;
+  display: flex;
+  gap: 1rem;
+  color: var(--muted);
+}
+
+.docs {
+  padding: 2rem 1.5rem 4rem;
+}
+.docs .prose {
+  max-width: 76ch;
+  margin: 0 auto;
+}
+.prose h1 {
+  margin-top: 0;
+}
+.prose h2 {
+  margin-top: 2.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+.prose h3 {
+  margin-top: 2rem;
+}
+.prose code {
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  background: var(--surface);
+}
+.prose pre {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow-x: auto;
+  background: var(--surface);
+}
+.prose pre code {
+  padding: 0;
+  background: transparent;
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+.prose p > img:only-child {
+  display: block;
+}
+.prose svg {
+  max-width: 100%;
+  height: auto;
+}
+.prose .vega {
+  max-width: 100%;
+  display: block;
+  margin: 1rem 0;
+}
+.prose .vega .vega-chart,
+.prose .vega .vega-chart-host {
+  max-width: 100%;
+}
+.prose .vega svg {
+  /* Keep Vega’s intrinsic SVG size — do not force height:auto on chart SVGs. */
+  height: unset;
+  display: block;
+}
+.muted {
+  color: var(--muted);
+}

@@ -1,0 +1,105 @@
+{
+  "name": "comark-etiket",
+  "version": "0.3.0",
+  "description": "Comark plugin to render barcode and QR codes to inline SVG (or PNG) at parse time with etiket.",
+  "comark": {
+    "headline": "Barcode &amp; QR",
+    "tagline": "Directives become inline SVG (or PNG) at parse time — no runtime component needed.",
+    "install": "npm i comark-etiket etiket"
+  },
+  "keywords": [
+    "comark",
+    "markdown",
+    "mdc",
+    "plugin",
+    "etiket",
+    "barcode",
+    "qrcode",
+    "qr"
+  ],
+  "homepage": "https://github.com/miguelrk/comark-etiket#readme",
+  "bugs": {
+    "url": "https://github.com/miguelrk/comark-etiket/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelrk/comark-etiket.git"
+  },
+  "author": "Miguel Romero Karam",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "play": "tsx playground/index.ts",
+    "play:nuxt": "pnpm --filter comark-etiket-playground dev",
+    "og:generate": "pnpm --filter comark-etiket-playground og:generate",
+    "prepack": "npm run build",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "comark": ">=0.4.0",
+    "etiket": ">=0.12.0"
+  },
+  "peerDependenciesMeta": {
+    "etiket": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "htmlparser2": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "comark": "catalog:",
+    "etiket": "^0.12.0",
+    "release-it": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm typecheck",
+        "pnpm test"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore(release): v${version}",
+      "tagName": "v${version}",
+      "requireBranch": "main",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    }
+  }
+}

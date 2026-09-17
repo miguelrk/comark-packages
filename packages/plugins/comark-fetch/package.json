@@ -1,0 +1,93 @@
+{
+  "name": "comark-fetch",
+  "version": "0.1.0",
+  "description": "Comark plugin for frontmatter fetch — parse-time HTTP into meta.fetch.",
+  "comark": {
+    "headline": "Fetch",
+    "tagline": "Frontmatter fetch entries resolve into meta at parse time.",
+    "install": "npm i comark-fetch"
+  },
+  "keywords": [
+    "comark",
+    "markdown",
+    "mdc",
+    "plugin",
+    "fetch",
+    "http"
+  ],
+  "homepage": "https://github.com/miguelrk/comark-fetch#readme",
+  "bugs": {
+    "url": "https://github.com/miguelrk/comark-fetch/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelrk/comark-fetch.git"
+  },
+  "author": "Miguel Romero Karam",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "play": "tsx playground/index.ts",
+    "play:nuxt": "pnpm --filter comark-fetch-playground dev",
+    "og:generate": "pnpm --filter comark-fetch-playground og:generate",
+    "prepack": "npm run build",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "comark": ">=0.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "comark": "catalog:",
+    "release-it": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm typecheck",
+        "pnpm test"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore(release): v${version}",
+      "tagName": "v${version}",
+      "requireBranch": "main",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    }
+  }
+}

@@ -1,0 +1,36 @@
+import { fileURLToPath } from 'node:url'
+
+export default defineNuxtConfig({
+  compatibilityDate: '2025-07-15',
+  modules: ['@comark/nuxt'],
+  css: ['~/assets/style.css'],
+  alias: {
+    'comark-flint/vue': fileURLToPath(new URL('../src/vue/index.ts', import.meta.url)),
+    'comark-flint': fileURLToPath(new URL('../src/index.ts', import.meta.url)),
+  },
+  runtimeConfig: {
+    public: {
+      siteUrl: 'https://miguelrk.github.io/comark-flint',
+    },
+  },
+  app: {
+    baseURL: process.env.NODE_ENV === 'development' ? '/' : '/comark-flint/',
+    head: {
+      htmlAttrs: { lang: 'en' },
+      meta: [{ name: 'color-scheme', content: 'light dark' }],
+      link: [{ rel: 'icon', href: 'data:,' }],
+    },
+  },
+  nitro: {
+    prerender: {
+      routes: ['/'],
+      crawlLinks: true,
+      ignore: ['/LICENSE', '/comark-flint/LICENSE'],
+    },
+  },
+  vite: {
+    server: {
+      fs: { allow: [fileURLToPath(new URL('..', import.meta.url))] },
+    },
+  },
+})

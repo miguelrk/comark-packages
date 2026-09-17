@@ -1,0 +1,24 @@
+{
+  "name": "comark-kv-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "og:generate": "node og/generate.mjs",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "@comark/nuxt": "catalog:",
+    "@comark/vue": "catalog:",
+    "comark": "catalog:",
+    "comark-kv": "workspace:*",
+    "nuxt": "catalog:",
+    "rangi": "catalog:",
+    "unstorage": "^1.17.5"
+  },
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

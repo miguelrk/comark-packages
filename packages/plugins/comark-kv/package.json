@@ -1,0 +1,116 @@
+{
+  "name": "comark-kv",
+  "version": "0.1.0",
+  "description": "Comark plugin for unstorage-backed key-value state with two-way kv.* model binding.",
+  "comark": {
+    "headline": "KV",
+    "tagline": "Frontmatter kv entries resolve into a live, persisted model at parse + render time.",
+    "install": "npm i comark-kv unstorage"
+  },
+  "keywords": [
+    "comark",
+    "markdown",
+    "mdc",
+    "plugin",
+    "kv",
+    "key-value",
+    "unstorage",
+    "model"
+  ],
+  "homepage": "https://github.com/miguelrk/comark-kv#readme",
+  "bugs": {
+    "url": "https://github.com/miguelrk/comark-kv/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelrk/comark-kv.git"
+  },
+  "author": "Miguel Romero Karam",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./model": {
+      "types": "./dist/model/index.d.mts",
+      "default": "./dist/model/index.mjs"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.mts",
+      "default": "./dist/vue/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "play": "tsx playground/index.ts",
+    "play:nuxt": "pnpm --filter comark-kv-playground dev",
+    "og:generate": "pnpm --filter comark-kv-playground og:generate",
+    "prepack": "npm run build",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "unstorage": "^1.17.5"
+  },
+  "peerDependencies": {
+    "comark": ">=0.7.0",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@comark/vue": "catalog:",
+    "@types/node": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "comark": "catalog:",
+    "happy-dom": "^20.0.0",
+    "release-it": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm typecheck",
+        "pnpm test"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore(release): v${version}",
+      "tagName": "v${version}",
+      "requireBranch": "main",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    }
+  }
+}

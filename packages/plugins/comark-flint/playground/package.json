@@ -1,0 +1,25 @@
+{
+  "name": "comark-flint-playground",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "og:generate": "node og/generate.mjs"
+  },
+  "dependencies": {
+    "@comark/nuxt": "catalog:",
+    "comark": "catalog:",
+    "comark-flint": "workspace:*",
+    "echarts": "^6.1.0",
+    "flint-chart": "^0.5.1",
+    "nuxt": "catalog:",
+    "rangi": "catalog:",
+    "vega": "^6.4.0",
+    "vega-embed": "^7.2.0",
+    "vega-lite": "^6.4.3"
+  }
+}
