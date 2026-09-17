@@ -2,9 +2,9 @@
   "name": "comark-packages",
   "private": true,
   "description": "Miguelrk Comark add-ons — plugins and output renderers.",
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@12.4.2",
   "engines": {
-    "node": ">=20"
+    "node": ">=26.1.0"
   },
   "scripts": {
     "build": "pnpm -r --filter '!*-playground' run build",
