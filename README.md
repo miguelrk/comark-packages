@@ -2,6 +2,8 @@
 
 Comark plugins and renderers. [Playgrounds](https://miguelrk.github.io/comark-packages/).
 
+## Packages
+
 | Package | Kind | Description |
 | --- | --- | --- |
 | [`comark-arrow`](https://miguelrk.github.io/comark-packages/comark-arrow/) | plugin | ArrowJS sandboxed widgets |
