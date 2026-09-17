@@ -1,8 +1,6 @@
 packages:
-  - 'packages/plugins/*'
-  - 'packages/renderers/*'
-  - 'packages/plugins/*/playground'
-  - 'packages/renderers/*/playground'
+  - 'packages/*'
+  - 'packages/*/playground'
 
 catalog:
   typescript: ^5.7.0

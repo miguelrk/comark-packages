@@ -1,0 +1,125 @@
+{
+  "name": "comark-vega",
+  "version": "0.3.0",
+  "description": "Comark plugin for Vega and Vega-Lite charts — AST component nodes with a shipped Vue renderer, plus optional parse-time SVG/img for static docs.",
+  "comark": {
+    "headline": "Vega charts",
+    "tagline": "Fenced specs and directives become interactive charts with a shipped Vue renderer.",
+    "install": "npm i comark-vega vega vega-lite"
+  },
+  "keywords": [
+    "comark",
+    "markdown",
+    "mdc",
+    "plugin",
+    "vega",
+    "vega-lite",
+    "chart",
+    "visualization",
+    "svg",
+    "vue",
+    "dashboard"
+  ],
+  "homepage": "https://miguelrk.github.io/comark-packages/comark-vega/",
+  "bugs": {
+    "url": "https://github.com/miguelrk/comark-packages/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelrk/comark-packages.git",
+    "directory": "packages/comark-vega"
+  },
+  "author": "Miguel Romero Karam",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.mts",
+      "default": "./dist/vue/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "play": "tsx playground/index.ts",
+    "play:nuxt": "pnpm --filter comark-vega-playground dev",
+    "og:generate": "pnpm --filter comark-vega-playground og:generate",
+    "prepack": "npm run build",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "comark": ">=0.4.0",
+    "vega": ">=6.0.0",
+    "vega-lite": ">=6.0.0",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "vega": {
+      "optional": true
+    },
+    "vega-lite": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "htmlparser2": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@vue/test-utils": "catalog:",
+    "comark": "catalog:",
+    "happy-dom": "^20.0.0",
+    "vega": "^6.0.0",
+    "vega-lite": "^6.0.0",
+    "release-it": "catalog:",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vue": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm typecheck",
+        "pnpm test"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore(release): ${name}@${version}",
+      "tagName": "${name}@${version}",
+      "requireBranch": "main",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "${name}@${version}"
+    },
+    "npm": {
+      "publish": true
+    }
+  }
+}

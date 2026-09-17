@@ -1,7 +1,7 @@
 {
   "name": "comark-packages",
   "private": true,
-  "description": "Miguelrk Comark add-ons — plugins and output renderers.",
+  "description": "Packages for Comark",
   "packageManager": "pnpm@12.4.2",
   "engines": {
     "node": ">=26.1.0"
@@ -9,6 +9,7 @@
   "scripts": {
     "build": "pnpm -r --filter '!*-playground' run build",
     "test": "pnpm -r --filter '!*-playground' --if-present run test",
-    "typecheck": "pnpm -r --filter '!*-playground' run typecheck"
+    "typecheck": "pnpm -r --filter '!*-playground' run typecheck",
+    "generate": "pnpm -r --filter '*-playground' run generate"
   }
 }

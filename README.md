@@ -1,19 +1,21 @@
 # comark-packages
 
-pnpm workspace for Miguelrk Comark add-ons: **plugins** and **output renderers**.
+pnpm workspace for Packages for Comark
+
+Playgrounds: [miguelrk.github.io/comark-packages](https://miguelrk.github.io/comark-packages/)
 
 ## Packages
 
-| Package | Kind | Description |
-| --- | --- | --- |
-| `comark-arrow` | plugin | ArrowJS sandboxed widgets |
-| `comark-etiket` | plugin | Barcode and QR codes via etiket |
-| `comark-fetch` | plugin | Frontmatter fetch into meta |
-| `comark-flint` | plugin | Flint charts (Vega-Lite / ECharts) |
-| `comark-kv` | plugin | unstorage-backed key-value model |
-| `comark-vega` | plugin | Vega and Vega-Lite charts |
-| `comark-email` | renderer | Email HTML via MJML |
-| `comark-pdf` | renderer | PDF output via jasy |
+| Package | Kind | Playground | Description |
+| --- | --- | --- | --- |
+| `comark-arrow` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-arrow/) | ArrowJS sandboxed widgets |
+| `comark-etiket` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-etiket/) | Barcode and QR codes via etiket |
+| `comark-fetch` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-fetch/) | Frontmatter fetch into meta |
+| `comark-flint` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-flint/) | Flint charts (Vega-Lite / ECharts) |
+| `comark-kv` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-kv/) | unstorage-backed key-value model |
+| `comark-vega` | plugin | [open](https://miguelrk.github.io/comark-packages/comark-vega/) | Vega and Vega-Lite charts |
+| `comark-email` | renderer | [open](https://miguelrk.github.io/comark-packages/comark-email/) | Email HTML via MJML |
+| `comark-pdf` | renderer | [open](https://miguelrk.github.io/comark-packages/comark-pdf/) | PDF output via jasy |
 
 ## Setup
 
@@ -29,52 +31,61 @@ From the repo root:
 pnpm build
 pnpm test
 pnpm typecheck
+pnpm generate
 ```
 
-Run a script in one package:
+`generate` builds every playground for GitHub Pages.
+
+Run a script in one package. Do not copy package scripts to the root. All packages share the same names.
 
 ```bash
 pnpm --filter comark-flint build
+pnpm --filter comark-flint play
 pnpm --filter comark-flint-playground dev
+pnpm --dir packages/comark-flint play
 ```
+
+## Release
+
+Each package still uses `release-it`. Run it from the root with `--filter`. Git tags use the package name so they do not collide.
+
+```bash
+pnpm --filter comark-flint release
+```
+
+That command:
+
+- runs `typecheck` and `test` for that package
+- bumps the package version
+- creates tag `comark-flint@x.y.z`
+- publishes that package to npm
+- opens a GitHub release on this repo
 
 ## Layout
 
 ```text
-packages/plugins/     # Parse plugins (ComarkPlugin)
-packages/renderers/   # Output renderers (markdown → fixed format)
+packages/<name>/
 ```
 
 Each package may include a private `playground/` Nuxt app for local development.
 
-## Plugins vs renderers
+A package is a **parse plugin** (`defineComarkPlugin` → `plugins: []`) or an **output renderer** (`createXRenderer()` → bytes or string). The kind is in the table above.
 
-Comark has two extension layers. This repo splits folders to match them.
-
-| Layer | API | Folder | Example |
-| --- | --- | --- | --- |
-| Parse plugin | `defineComarkPlugin` → `plugins: []` | `packages/plugins/` | `comark-fetch`, `comark-flint` |
-| Output renderer | `createXRenderer()` → bytes or string | `packages/renderers/` | `comark-email`, `comark-pdf` |
-
-**Rule of thumb:** if the main export is a plugin factory, put it in `plugins/`. If the main export turns markdown into one output format (email HTML, PDF bytes), put it in `renderers/`.
-
-### They are not 100% separate
-
-- **Hybrid plugins** (`comark-arrow`, `comark-flint`, `comark-vega`, `comark-kv`) also ship subpaths such as `./vue` or `./html`. Those are component handlers for render time, not output renderers. They stay in `plugins/`.
+- **Hybrid plugins** (`comark-arrow`, `comark-flint`, `comark-vega`, `comark-kv`) also ship subpaths such as `./vue` or `./html`. Those are component handlers for render time, not output renderers.
 - **Renderers use plugins internally.** `comark-pdf` and `comark-email` accept `plugins: []` and ship format-specific handlers under `./plugins/*` (jasy/MJML adapters, not parse plugins).
-- **A plugin does not become a renderer.** Different primary API and consumer intent. A chart plugin may add `/vue` handlers; it does not become `createPdfRenderer`.
-- **A renderer does not become a plugin.** It already wraps parsing plus format output.
 
 ### Adding a new package
 
-| You are building… | Put it in… |
+Put the new package in `packages/<name>/`.
+
+| You are building… | Kind |
 | --- | --- |
-| Parse-time syntax, meta, AST nodes | `packages/plugins/` |
-| Markdown → email, PDF, or another fixed format | `packages/renderers/` |
+| Parse-time syntax, meta, AST nodes | plugin |
+| Markdown → email, PDF, or another fixed format | renderer |
 | Nuxt module, CLI, or app integration only | Not here yet (future `integrations/` if needed) |
 
-## Follow-ups
+After you add a package: add it to the CI `pkg.pr.new` list, the Pages assemble loop, `pages/index.html`, and the table above.
 
-- Initialize git and add GitHub remote `miguelrk/comark-packages`
-- Publish a package: `pnpm --filter <name> publish`
-- Per-repo GitHub Pages URLs from the old standalone repos do not move automatically; plan a multi-path Pages deploy or keep old repos as redirects
+## Known gap
+
+`comark-kv` model tests and typecheck import `comark/model`. That export is not in `comark@0.7.0`. Parse-time kv tests pass. The model layer waits on a newer `comark`.
