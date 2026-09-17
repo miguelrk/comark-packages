@@ -56,11 +56,6 @@ export const resolveDriver = async (
     return sessionStorageDriver({ window: win })
   }
 
-  if (name === 'indexedb') {
-    const { default: indexedb } = await import('unstorage/drivers/indexedb')
-    return indexedb({})
-  }
-
   throw new Error(`[comark-kv] Unsupported driver "${name}". Pass options.driver to inject a custom unstorage driver.`)
 }
 

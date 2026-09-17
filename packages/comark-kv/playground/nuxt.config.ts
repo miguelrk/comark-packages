@@ -6,6 +6,8 @@ const kvAliases = {
   'comark-kv/model': `${root}/src/model/index.ts`,
   'comark-kv/vue': `${root}/src/vue/index.ts`,
   'comark-kv': `${root}/src/index.ts`,
+  // comark@0.7.0 has no ./model export. Map it to the local store.
+  'comark/model': `${root}/src/model/store.ts`,
 }
 
 export default defineNuxtConfig({
@@ -48,7 +50,7 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
-      include: ['comark', 'comark/utils', 'comark/model', 'unstorage'],
+      include: ['comark', 'comark/utils', 'unstorage'],
       exclude: ['comark-kv', 'comark-kv/model', 'comark-kv/vue'],
     },
   },
