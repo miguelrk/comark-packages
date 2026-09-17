@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   alias: kvAliases,
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-kv',
+      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-kv',
     },
   },
   app: {

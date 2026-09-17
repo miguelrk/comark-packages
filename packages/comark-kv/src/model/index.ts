@@ -33,8 +33,8 @@
  * ```
  */
 
-import { createModelStore } from 'comark/model'
-import type { ComarkModel } from 'comark/model'
+import { createModelStore } from './store.ts'
+import type { ComarkModel } from './store.ts'
 import { createStorage } from 'unstorage'
 import type { Driver, Storage } from 'unstorage'
 import type { KvDescriptor, KvSchema } from '../types.ts'
@@ -44,6 +44,7 @@ import type { ResolveDriverOptions } from './drivers.ts'
 
 export { keyFromStorageKey, resolveDriver, storageKey } from './drivers.ts'
 export type { ResolveDriverOptions } from './drivers.ts'
+export type { ComarkModel } from './store.ts'
 
 export interface CreateKvModelOptions extends ResolveDriverOptions {
   /**

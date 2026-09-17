@@ -1,7 +1,5 @@
 # comark-kv
 
-> The live model (`comark-kv/model`, `comark-kv/vue`) imports `comark/model`. That subpath is not in `comark@0.7.0`. Parse-time frontmatter still typechecks. The model layer needs a newer `comark` that exports `./model`.
-
 A [Comark](https://comark.dev) plugin that declares a `kv:` block in frontmatter,
 backed by [unstorage](https://unstorage.unjs.io), and exposes a live writable
 `kv.*` namespace for two-way `::prop` model binding.
@@ -23,8 +21,8 @@ Two forms are supported:
 pnpm add comark-kv unstorage
 ```
 
-`comark` (with `comark/model`) is a peer dependency. `vue` is an optional peer
-for the `comark-kv/vue` composable.
+`comark` is a peer dependency. `vue` is an optional peer for the
+`comark-kv/vue` composable.
 
 ## Frontmatter
 

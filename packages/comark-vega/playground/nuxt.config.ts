@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-vega',
+      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-vega',
     },
   },
   app: {

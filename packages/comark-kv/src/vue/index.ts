@@ -28,7 +28,7 @@
  */
 
 import type { MarkdownDocument } from 'comark'
-import type { ComarkModel } from 'comark/model'
+import type { ComarkModel } from '../model/store.ts'
 import { onUnmounted, shallowRef } from 'vue'
 import type { Ref, ShallowRef } from 'vue'
 import { createKvModel } from '../model/index.ts'

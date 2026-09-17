@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-fetch',
+      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-fetch',
     },
   },
   app: {

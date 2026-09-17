@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-email',
+      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-email',
     },
   },
   app: {
