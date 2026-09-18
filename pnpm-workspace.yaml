@@ -22,3 +22,14 @@ catalog:
 allowBuilds:
   esbuild: true
   vue-demi: true
+
+tasks:
+  build:
+    dependsOn: ['^build']
+    outputs: ['dist/**']
+  generate:
+    dependsOn: ['^build']
+    outputs: ['.output/public/**']
+
+pipelines:
+  generate: [generate]

@@ -27,9 +27,7 @@ jobs:
           node-version: 26
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm generate
+      - run: pnpm pipeline --full generate
 
       - name: Assemble GitHub Pages site
         run: |

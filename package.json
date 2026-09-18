@@ -10,6 +10,6 @@
     "build": "pnpm -r --filter '!*-playground' run build",
     "test": "pnpm -r --filter '!*-playground' --if-present run test",
     "typecheck": "pnpm -r --filter '!*-playground' run typecheck",
-    "generate": "pnpm -r --filter '*-playground' run generate"
+    "generate": "pnpm pipeline --full generate"
   }
 }
