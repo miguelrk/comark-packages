@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p _site
           cp pages/index.html _site/index.html
-          for name in comark-arrow comark-etiket comark-fetch comark-flint comark-kv comark-vega comark-email comark-pdf; do
+          for name in comark-arrow comark-etiket comark-flint comark-kv comark-vega comark-email comark-pdf; do
             cp -R "packages/${name}/playground/.output/public" "_site/${name}"
           done
 
