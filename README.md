@@ -15,21 +15,12 @@ Comark plugins and renderers.
 | [`comark-email`](https://miguelrk.github.io/comark-packages/comark-email/)   | renderer | done        | Email HTML via MJML                |
 | [`comark-pdf`](https://miguelrk.github.io/comark-packages/comark-pdf/)       | renderer | done        | PDF output via jasy                |
 
-## Install (from GitHub)
-
-These packages are not on [npm](https://npmjs.com).
+## Install
 
 ```bash
-# default branch
-pnpm add "<package>@github:miguelrk/comark-packages#path:/packages/<package>"
-# tag
-pnpm add "<package>@github:miguelrk/comark-packages#v0.2.0&path:/packages/<package>"
-# commit
-pnpm add "<package>@github:miguelrk/comark-packages#a1b2c3d&path:/packages/<package>"
+# npm
+pnpm add <package>
 ```
-
-> [!WARNING]
-> `path:` works with pnpm only.
 
 ## Development
 
