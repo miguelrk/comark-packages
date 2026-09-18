@@ -5,16 +5,16 @@ export default defineNuxtConfig({
   modules: ['@comark/nuxt'],
   css: ['~/assets/style.css'],
   alias: {
-    'comark-flint/vue': fileURLToPath(new URL('../src/vue/index.ts', import.meta.url)),
-    'comark-flint': fileURLToPath(new URL('../src/index.ts', import.meta.url)),
+    'comark-flint-chart/vue': fileURLToPath(new URL('../src/vue/index.ts', import.meta.url)),
+    'comark-flint-chart': fileURLToPath(new URL('../src/index.ts', import.meta.url)),
   },
   runtimeConfig: {
     public: {
-      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-flint',
+      siteUrl: 'https://miguelrk.github.io/comark-packages/comark-flint-chart',
     },
   },
   app: {
-    baseURL: process.env.NODE_ENV === 'development' ? '/' : '/comark-packages/comark-flint/',
+    baseURL: process.env.NODE_ENV === 'development' ? '/' : '/comark-packages/comark-flint-chart/',
     head: {
       htmlAttrs: { lang: 'en' },
       meta: [{ name: 'color-scheme', content: 'light dark' }],
@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     prerender: {
       routes: ['/'],
       crawlLinks: true,
-      ignore: ['/LICENSE', '/comark-packages/comark-flint/LICENSE'],
+      ignore: ['/LICENSE', '/comark-packages/comark-flint-chart/LICENSE'],
     },
   },
   vite: {

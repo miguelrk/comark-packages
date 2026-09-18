@@ -1,5 +1,5 @@
 {
-  "name": "comark-flint-playground",
+  "name": "comark-flint-chart-playground",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   "dependencies": {
     "@comark/nuxt": "catalog:",
     "comark": "catalog:",
-    "comark-flint": "workspace:*",
+    "comark-flint-chart": "workspace:*",
     "echarts": "^6.1.0",
     "flint-chart": "^0.5.1",
     "nuxt": "catalog:",

@@ -1,17 +1,17 @@
-# comark-flint
+# comark-flint-chart
 
 A [Comark](https://comark.dev) plugin for [Flint](https://github.com/microsoft/flint-chart) charts — compiles Flint specs into backend-native charts and emits a `<Flint>` component node.
 
 Ships a Vue renderer; parse-time SVG/img is an **opt-in** for static docs.
 
-![npm version](https://img.shields.io/npm/v/comark-flint?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-flint?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
+![npm version](https://img.shields.io/npm/v/comark-flint-chart?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-flint-chart?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-flint — Flint charts for Comark](playground/public/og.png)
+![comark-flint-chart — Flint charts for Comark](playground/public/og.png)
 
 ## Install
 
 ```bash
-pnpm add comark-flint flint-chart
+pnpm add comark-flint-chart flint-chart
 ```
 
 `comark` and `flint-chart` are peer dependencies.
@@ -32,7 +32,7 @@ Parse-time `svg` / `img` output is **opt-in** (`output: 'svg'` or `output: 'img'
 
 ```ts
 import { parseMarkdown } from 'comark'
-import flint from 'comark-flint'
+import flint from 'comark-flint-chart'
 
 const tree = await parseMarkdown(content, {
   plugins: [flint({ flint: { output: 'svg' } })],
@@ -46,7 +46,7 @@ With `output: 'component'` (default) and no framework renderer, the AST still co
 ```vue
 <script setup lang="ts">
 import { Markdown } from '@comark/vue'
-import flint, { Flint } from 'comark-flint/vue'
+import flint, { Flint } from 'comark-flint-chart/vue'
 </script>
 
 <template>
@@ -162,7 +162,7 @@ flint:
 Pass defaults via the plugin factory — frontmatter values override these:
 
 ```ts
-import flint from 'comark-flint'
+import flint from 'comark-flint-chart'
 
 const plugins = [
   flint({

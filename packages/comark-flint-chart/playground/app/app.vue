@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const GITHUB_URL = 'https://github.com/miguelrk/comark-packages/tree/main/packages/comark-flint'
+const GITHUB_URL = 'https://github.com/miguelrk/comark-packages/tree/main/packages/comark-flint-chart'
 const DESCRIPTION =
   'Comark plugin for Flint charts — AST component nodes with a shipped Vue renderer, plus optional parse-time SVG/img for static docs.'
 
 useHead({
-  titleTemplate: (title) => (title ? `${title} · comark-flint` : 'comark-flint'),
+  titleTemplate: (title) => (title ? `${title} · comark-flint-chart` : 'comark-flint-chart'),
 })
 
 const config = useRuntimeConfig()
@@ -17,15 +17,15 @@ const siteUrl = String(
 useSeoMeta({
   description: DESCRIPTION,
   ogType: 'website',
-  ogSiteName: 'comark-flint',
-  ogTitle: 'comark-flint · Flint charts for Comark',
+  ogSiteName: 'comark-flint-chart',
+  ogTitle: 'comark-flint-chart · Flint charts for Comark',
   ogDescription: DESCRIPTION,
   ogImage: `${siteUrl}/og.png`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
-  ogImageAlt: 'comark-flint: a Flint fenced block on the left, the compiled chart Comark renders on the right',
+  ogImageAlt: 'comark-flint-chart: a Flint fenced block on the left, the compiled chart Comark renders on the right',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'comark-flint · Flint charts for Comark',
+  twitterTitle: 'comark-flint-chart · Flint charts for Comark',
   twitterDescription: DESCRIPTION,
   twitterImage: `${siteUrl}/og.png`,
 })
@@ -37,7 +37,7 @@ useSeoMeta({
       class="brand"
       to="/"
     >
-      comark-flint
+      comark-flint-chart
     </NuxtLink>
     <nav
       class="tabs"

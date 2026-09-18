@@ -1,12 +1,12 @@
 /**
- * Vue entry for comark-flint — plugin + `<Flint>` renderer.
+ * Vue entry for comark-flint-chart — plugin + `<Flint>` renderer.
  *
  * ```ts
- * import flint, { Flint } from 'comark-flint/vue'
+ * import flint, { Flint } from 'comark-flint-chart/vue'
  * // <Markdown :plugins="[flint()]" :components="{ Flint }" />
  * ```
  *
- * React / Svelte companions can follow as `comark-flint/react` etc.
+ * React / Svelte companions can follow as `comark-flint-chart/react` etc.
  */
 
 export { default, svgToNodes, parseFenceMeta, resolvePath, assembleSpec } from '../index.ts'

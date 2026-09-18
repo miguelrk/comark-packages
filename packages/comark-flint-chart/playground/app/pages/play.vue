@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { parseMarkdown } from 'comark'
 import { renderMarkdown } from 'comark/render'
-import flint, { Flint } from 'comark-flint/vue'
-import type { FlintPluginMeta } from 'comark-flint'
+import flint, { Flint } from 'comark-flint-chart/vue'
+import type { FlintPluginMeta } from 'comark-flint-chart'
 
 useHead({ title: 'Playground' })
 

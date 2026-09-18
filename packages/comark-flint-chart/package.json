@@ -1,11 +1,11 @@
 {
-  "name": "comark-flint",
-  "version": "0.3.0",
+  "name": "comark-flint-chart",
+  "version": "0.1.0",
   "description": "Comark plugin for Flint charts — AST component nodes with a shipped Vue renderer, plus optional parse-time SVG/img for static docs.",
   "comark": {
     "headline": "Flint charts",
     "tagline": "Fenced Flint specs become Vega-Lite or ECharts charts with a shipped Vue renderer.",
-    "install": "npm i comark-flint flint-chart"
+    "install": "npm i comark-flint-chart flint-chart"
   },
   "keywords": [
     "comark",
@@ -21,14 +21,14 @@
     "echarts",
     "vue"
   ],
-  "homepage": "https://miguelrk.github.io/comark-packages/comark-flint/",
+  "homepage": "https://miguelrk.github.io/comark-packages/comark-flint-chart/",
   "bugs": {
     "url": "https://github.com/miguelrk/comark-packages/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/miguelrk/comark-packages.git",
-    "directory": "packages/comark-flint"
+    "directory": "packages/comark-flint-chart"
   },
   "author": "Miguel Romero Karam",
   "license": "MIT",
@@ -57,8 +57,8 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "play": "tsx playground/index.ts",
-    "play:nuxt": "pnpm --filter comark-flint-playground dev",
-    "og:generate": "pnpm --filter comark-flint-playground og:generate",
+    "play:nuxt": "pnpm --filter comark-flint-chart-playground dev",
+    "og:generate": "pnpm --filter comark-flint-chart-playground og:generate",
     "prepack": "npm run build",
     "release": "release-it",
     "test": "vitest run",

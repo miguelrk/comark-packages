@@ -1,6 +1,6 @@
 # Comark — Flint Plugin Playground
 
-Nuxt site for `comark-flint`.
+Nuxt site for `comark-flint-chart`.
 
 - `/` — repository README, rendered with Comark
 - `/play` — editable Markdown with Flint fenced blocks and directives

@@ -12,7 +12,7 @@
 | Fence keyword | `arrow` |
 | Component | `<ArrowSandbox>` |
 
-Third-party tier (unscoped `comark-*`), consistent with the sibling packages `comark-vega`, `comark-flint` and `comark-etiket`, which each shorten the upstream library name.
+Third-party tier (unscoped `comark-*`), consistent with the sibling packages `comark-vega`, `comark-flint-chart` and `comark-etiket`, which each shorten the upstream library name.
 
 The fence keyword matches the convention of `mermaid`, `math` and `json-render` — the fence names the language, not the package.
 
@@ -149,7 +149,7 @@ Arrow's `sandbox()` accepts `main.ts`/`main.js` plus optional `main.css`. A sing
 
 ### 6.3 Component syntax (bound source)
 
-Per the pattern established for `comark-vega`/`comark-flint`, a `::`-form allows the source to come from bound data rather than from the document:
+Per the pattern established for `comark-vega`/`comark-flint-chart`, a `::`-form allows the source to come from bound data rather than from the document:
 
 ```markdown
 ::arrow{:source="widgets.reorderCalculator"}

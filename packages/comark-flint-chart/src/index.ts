@@ -1,5 +1,5 @@
 /**
- * comark-flint: Comark plugin to compile Flint specs to Vega-Lite
+ * comark-flint-chart: Comark plugin to compile Flint specs to Vega-Lite
  * (and other backends) at parse time using the `flint-chart` peer dependency.
  *
  * Supports two entry-point syntaxes that both converge on a single `<Flint>`
@@ -36,14 +36,14 @@
  * @example
  * ```ts
  * import { parseMarkdown } from 'comark'
- * import flint from 'comark-flint'
+ * import flint from 'comark-flint-chart'
  *
  * const doc = await parseMarkdown(content, { plugins: [flint()] })
  * ```
  *
  * For interactive apps, also register the shipped Vue `<Flint>` renderer:
  * ```ts
- * import flint, { Flint } from 'comark-flint/vue'
+ * import flint, { Flint } from 'comark-flint-chart/vue'
  * // <Markdown :plugins="[flint()]" :components="{ Flint }" />
  * ```
  *
@@ -144,7 +144,7 @@ const loadFlint = async (): Promise<FlintModule | null> => {
     return _flintModule
   } catch {
     console.warn(
-      '[comark-flint] Peer dependency "flint-chart" is not installed. ' +
+      '[comark-flint-chart] Peer dependency "flint-chart" is not installed. ' +
         'Run `npm install flint-chart` to enable ::flint directives and fenced blocks.',
     )
     return null
@@ -427,7 +427,7 @@ const processFlintNode = async (
 
     if (specValue === undefined) {
       console.warn(
-        '[comark-flint] ::flint directive is missing a spec. ' +
+        '[comark-flint-chart] ::flint directive is missing a spec. ' +
           'Provide spec="..." or :spec="frontmatterPath"',
       )
       return undefined
@@ -461,7 +461,7 @@ const processFlintNode = async (
   }
 
   if (!rawSpec) {
-    console.warn('[comark-flint] Empty chart spec — skipping')
+    console.warn('[comark-flint-chart] Empty chart spec — skipping')
     return undefined
   }
 
@@ -484,7 +484,7 @@ const processFlintNode = async (
     input = typeof rawSpec === 'object' ? rawSpec : JSON.parse(rawSpec)
   } catch {
     console.warn(
-      `[comark-flint] Failed to parse spec as JSON: ${rawSpec.slice(0, 120)}…`,
+      `[comark-flint-chart] Failed to parse spec as JSON: ${rawSpec.slice(0, 120)}…`,
     )
     return makeFallbackNode(rawSpec, 'invalid JSON spec')
   }
@@ -500,7 +500,7 @@ const processFlintNode = async (
     compiledSpec = assembleSpec(mod, input, backend)
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
-    console.warn(`[comark-flint] Spec compilation failed: ${msg}`)
+    console.warn(`[comark-flint-chart] Spec compilation failed: ${msg}`)
     return makeFallbackNode(rawSpec, msg)
   }
 
@@ -524,7 +524,7 @@ const processFlintNode = async (
 
     // Renderer not available — warn and fall through to component node
     console.warn(
-      `[comark-flint] output="${output}" requested for backend "${backend}" ` +
+      `[comark-flint-chart] output="${output}" requested for backend "${backend}" ` +
         `but the renderer peer is not installed. ` +
         (backend === 'vegalite'
           ? 'Install `vega` and `vega-lite` to enable parse-time SVG rendering.'
@@ -618,7 +618,7 @@ const plugin: ComarkPluginFactory<FlintConfig> = defineComarkPlugin<FlintConfig>
             return result
           } catch (err) {
             console.warn(
-              `[comark-flint] Unexpected error processing node: ${err instanceof Error ? err.message : String(err)}`,
+              `[comark-flint-chart] Unexpected error processing node: ${err instanceof Error ? err.message : String(err)}`,
             )
             return undefined
           }

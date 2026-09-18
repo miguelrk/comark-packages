@@ -41,11 +41,11 @@ const errorMessage = (err: unknown, fallback: string): string =>
   err instanceof Error ? err.message : fallback
 
 /**
- * Vue renderer for `<Flint>` AST nodes emitted by `comark-flint`.
+ * Vue renderer for `<Flint>` AST nodes emitted by `comark-flint-chart`.
  *
  * Register alongside the plugin:
  * ```ts
- * import flint, { Flint } from 'comark-flint/vue'
+ * import flint, { Flint } from 'comark-flint-chart/vue'
  * // <Markdown :plugins="[flint()]" :components="{ Flint }" />
  * ```
  *

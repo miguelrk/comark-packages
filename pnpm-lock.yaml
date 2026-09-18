@@ -380,7 +380,7 @@ importers:
         specifier: 'catalog:'
         version: 2.2.0
 
-  packages/comark-flint:
+  packages/comark-flint-chart:
     dependencies:
       htmlparser2:
         specifier: ^12.0.0
@@ -432,7 +432,7 @@ importers:
         specifier: 'catalog:'
         version: 3.5.42(typescript@5.9.3)
 
-  packages/comark-flint/playground:
+  packages/comark-flint-chart/playground:
     dependencies:
       '@comark/nuxt':
         specifier: 'catalog:'
@@ -440,7 +440,7 @@ importers:
       comark:
         specifier: 'catalog:'
         version: 0.7.0(rangi@2.2.0)
-      comark-flint:
+      comark-flint-chart:
         specifier: workspace:*
         version: link:..
       echarts:
