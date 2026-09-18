@@ -1,6 +1,6 @@
 {
   "name": "comark-flint-chart",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Comark plugin for Flint charts — AST component nodes with a shipped Vue renderer, plus optional parse-time SVG/img for static docs.",
   "comark": {
     "headline": "Flint charts",
