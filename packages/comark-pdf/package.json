@@ -94,14 +94,14 @@
       ]
     },
     "git": {
-      "commitMessage": "chore(release): ${name}@${version}",
-      "tagName": "${name}@${version}",
+      "commitMessage": "chore(release): ${npm.name}@${version}",
+      "tagName": "${npm.name}@${version}",
       "requireBranch": "main",
       "requireCleanWorkingDir": true
     },
     "github": {
       "release": true,
-      "releaseName": "${name}@${version}"
+      "releaseName": "${npm.name}@${version}"
     },
     "npm": {
       "publish": true
