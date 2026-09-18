@@ -17,15 +17,19 @@ Comark plugins and renderers.
 
 ## Install (from GitHub)
 
+These packages are not on [npm](https://npmjs.com).
+
 ```bash
-pnpm add "comark-fetch@github:miguelrk/comark-packages#path:/packages/comark-fetch"
-pnpm add "comark-fetch@github:miguelrk/comark-packages#main&path:/packages/comark-fetch"
+# default branch
+pnpm add "<package>@github:miguelrk/comark-packages#path:/packages/<package>"
+# tag
+pnpm add "<package>@github:miguelrk/comark-packages#v0.2.0&path:/packages/<package>"
+# commit
+pnpm add "<package>@github:miguelrk/comark-packages#a1b2c3d&path:/packages/<package>"
 ```
 
-Replace `comark-fetch` and the `path:` folder with the package you want.
-
-> [!NOTE]
-> The `github:…#path:` specifier works with pnpm only.
+> [!WARNING]
+> `path:` works with pnpm only.
 
 ## Development
 
