@@ -15,7 +15,6 @@
     "@comark/nuxt": "catalog:",
     "comark": "catalog:",
     "comark-email": "workspace:*",
-    "mjml": "^5.0.0",
     "nuxt": "catalog:",
     "rangi": "catalog:"
   }

@@ -31,7 +31,7 @@ const loadMjml = async (): Promise<Mjml2HtmlFn> => {
     _mjml2html = fn as Mjml2HtmlFn
     return _mjml2html
   } catch {
-    throw new Error('[comark-email] mjml is required. Install it: pnpm add mjml')
+    throw new Error('[comark-email] failed to load mjml (a comark-email dependency)')
   }
 }
 

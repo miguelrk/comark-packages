@@ -5,7 +5,7 @@
   "comark": {
     "headline": "Email renderer",
     "tagline": "Convert Markdown to responsive, MJML-compiled email HTML — parse-time, Node-only.",
-    "install": "npm i comark-email mjml @comark/html"
+    "install": "npm i comark-email"
   },
   "keywords": [
     "comark",
@@ -67,20 +67,16 @@
   },
   "peerDependencies": {
     "@comark/html": ">=0.7.0",
-    "comark": ">=0.4.0",
-    "mjml": ">=5"
+    "comark": ">=0.4.0"
   },
-  "peerDependenciesMeta": {
-    "mjml": {
-      "optional": true
-    }
+  "dependencies": {
+    "mjml": "^5.0.0"
   },
   "devDependencies": {
     "@comark/html": "catalog:",
     "@types/mjml": "^5.0.0",
     "@types/node": "catalog:",
     "comark": "catalog:",
-    "mjml": "^5.0.0",
     "release-it": "catalog:",
     "tsdown": "catalog:",
     "tsx": "catalog:",

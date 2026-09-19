@@ -11,8 +11,10 @@ Email renderer for Comark. Convert Markdown to responsive, MJML-compiled HTML fo
 ## Install
 
 ```bash
-pnpm add comark-email mjml @comark/html
+pnpm add comark-email
 ```
+
+`comark` and `@comark/html` are peer dependencies. `mjml` is a dependency.
 
 ## Usage
 
