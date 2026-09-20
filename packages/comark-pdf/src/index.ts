@@ -5,14 +5,18 @@ import type { PdfRendererOptions } from './types.ts'
 
 export { renderPdfDocument, renderPdfBytes, renderPdfFromDocument } from './render.ts'
 export type {
-  PdfMargin,
-  PdfPageConfig,
-  PdfRendererOptions,
+  PdfChrome,
   PdfEncryptOptions,
+  PdfFace,
+  PdfFontFaces,
   PdfJustify,
   PdfAlign,
-  PdfTextAlign,
+  PdfMargin,
   PdfOverflowPolicy,
+  PdfPageConfig,
+  PdfRendererOptions,
+  PdfTextAlign,
+  PdfVisuals,
 } from './types.ts'
 export type { JasyComponentFn, JasyMapContext, JasyTextDefaults } from './jasy.ts'
 export {

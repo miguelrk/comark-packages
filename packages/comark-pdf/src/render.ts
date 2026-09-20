@@ -39,20 +39,38 @@ export const renderPdfDocument = (
       }
     : undefined
 
-  const nodes = astToJasy(document.nodes, options?.components, textDefaults)
+  const nodes = astToJasy(document.nodes, options?.components, textDefaults, options?.visuals)
   const content = nodes.length > 0 ? nodes : []
+
+  if (options?.chrome?.header) pageProps.header = options.chrome.header
+  if (options?.chrome?.footer) pageProps.footer = options.chrome.footer
+  if (options?.chrome?.watermark) {
+    pageProps.header = pageProps.header
+      ? Column([options.chrome.watermark, pageProps.header])
+      : options.chrome.watermark
+  }
+
   const page = Page(pageProps as PageOptions, [Column({ gap }, content)])
 
   return documentOpts ? Document(documentOpts, [page]) : Document([page])
 }
 
-export const renderPdfBytes = (
+export const renderPdfBytes = async (
   document: MarkdownDocument | { nodes: MarkdownDocument['nodes'] },
   options?: PdfRendererOptions,
 ): Promise<Uint8Array> => {
   const pdfConfig = resolvePdfConfig(document, options)
-  const renderOpts = pdfConfigToRenderOptions(pdfConfig, options?.fonts) as RenderOptions | undefined
-  return renderToBytes(renderPdfDocument(document, options), renderOpts)
+  const renderOpts = {
+    ...pdfConfigToRenderOptions(pdfConfig),
+    ...(options?.onMissingGlyphs ? { onMissingGlyphs: options.onMissingGlyphs } : {}),
+  } as RenderOptions | undefined
+  const doc = renderPdfDocument(document, options)
+  if (options?.fonts) {
+    for (const [name, faces] of Object.entries(options.fonts)) {
+      doc.addFont(name, faces)
+    }
+  }
+  return renderToBytes(doc, renderOpts)
 }
 
 /** Alias for `renderPdfBytes` — kept for compatibility. */

@@ -1,5 +1,71 @@
+import type { PDFElement } from '@jasy/pdf'
 import type { ParserOptions } from 'comark'
 import type { JasyComponentFn } from './jasy.ts'
+
+export type PdfFace = {
+  size?: number
+  color?: string
+  bold?: boolean
+  italic?: boolean
+  uppercase?: boolean
+  tracking?: number
+  lineHeight?: number
+  pad?: { top?: number, bottom?: number, left?: number, right?: number }
+}
+
+export type PdfVisuals = {
+  face?: {
+    title?: PdfFace
+    section?: PdfFace
+    sub?: PdfFace
+    detail?: PdfFace
+    body?: PdfFace
+    tableHeader?: PdfFace
+    tableBody?: PdfFace
+    link?: PdfFace
+    code?: PdfFace
+  }
+  ink?: {
+    rule?: string
+    hairline?: string
+    panel?: string
+    muted?: string
+    faint?: string
+  }
+  space?: {
+    section?: number
+    block?: number
+    tight?: number
+  }
+  section?: {
+    rule?: boolean | { color?: string, thickness?: number }
+  }
+  table?: {
+    cellPad?: { x: number, y: number }
+    headerBg?: string
+    rule?: string
+    keyValue?: boolean | { columns?: [string, string] }
+  }
+  quote?: {
+    pad?: PdfFace['pad']
+    bg?: string
+    bar?: string
+  }
+  image?: 'embed' | 'alt'
+}
+
+export type PdfChrome = {
+  header?: PDFElement
+  footer?: PDFElement
+  watermark?: PDFElement
+}
+
+export type PdfFontFaces = Uint8Array | string | {
+  normal: Uint8Array | string
+  bold?: Uint8Array | string
+  italic?: Uint8Array | string
+  boldItalic?: Uint8Array | string
+}
 
 export interface PdfMargin {
   top?: string | number
@@ -61,10 +127,8 @@ export interface PdfPageConfig {
 export interface PdfRendererOptions extends ParserOptions {
   pdf?: PdfPageConfig
   components?: Record<string, JasyComponentFn>
-  fonts?: Record<string, Uint8Array | {
-    normal: Uint8Array
-    bold?: Uint8Array
-    italic?: Uint8Array
-    boldItalic?: Uint8Array
-  }>
+  visuals?: PdfVisuals
+  chrome?: PdfChrome
+  fonts?: Record<string, PdfFontFaces>
+  onMissingGlyphs?: (chars: string[]) => void
 }

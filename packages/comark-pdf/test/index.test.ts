@@ -115,3 +115,48 @@ describe('renderPdfFromDocument', () => {
     expect(isPdf(bytes)).toBe(true)
   })
 })
+
+describe('chrome and visuals', () => {
+  it('accepts PDFElement chrome without a host peel', async () => {
+    const { Text } = await import('@jasy/pdf')
+    const bytes = await renderPdf('# Body', {
+      chrome: {
+        header: Text('Letterhead'),
+        footer: Text('Legal'),
+      },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('maps headings from visuals faces', async () => {
+    const bytes = await renderPdf('# Title\n\n## Section\n\nBody', {
+      visuals: {
+        face: { title: { size: 12 }, section: { size: 9, bold: true } },
+        section: { rule: true },
+      },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('keeps custom components inside table cells', async () => {
+    const { TextField } = await import('@jasy/pdf')
+    const { PdfDocument, readAcroForm } = await import('@jasy/pdf/edit')
+    const bytes = await renderPdf('| |\n| --- |\n| :field-text{name="lot.id"} |\n', {
+      visuals: { table: { keyValue: true } },
+      components: {
+        'field-text': (element) => {
+          const [, attrs] = element
+          return TextField({ name: String(attrs.name ?? 'field') })
+        },
+      },
+    })
+    expect(isPdf(bytes)).toBe(true)
+    const names = (readAcroForm(PdfDocument.load(bytes))?.fields ?? []).map((f: { name: string }) => f.name)
+    expect(names).toContain('lot.id')
+  })
+
+  it('renders svg nodes', async () => {
+    const bytes = await renderPdf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="100%" height="100%"><rect width="10" height="10"/></svg>')
+    expect(isPdf(bytes)).toBe(true)
+  })
+})
