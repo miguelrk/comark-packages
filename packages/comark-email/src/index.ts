@@ -2,7 +2,7 @@ import { createMarkdownParser } from 'comark'
 import { renderEmailFromDocument } from './render.ts'
 import type { EmailRendererOptions, EmailRenderResult } from './types.ts'
 
-export { renderEmailFromDocument, documentToMjml } from './render.ts'
+export { renderEmailFromDocument, documentToMjml, documentToText } from './render.ts'
 export { compileMjml } from './mjml.ts'
 export type {
   EmailConfig,
@@ -27,7 +27,7 @@ export type {
  *   email: { brandColor: '#0066cc' },
  * })
  *
- * const { html, subject } = await render(markdownString)
+ * const { html, text, subject } = await render(markdownString)
  * ```
  */
 export const createEmailRenderer = (
@@ -47,7 +47,7 @@ export const createEmailRenderer = (
  * ```typescript
  * import { renderEmail } from 'comark-email'
  *
- * const { html, subject, previewText } = await renderEmail(`
+ * const { html, text, subject, previewText } = await renderEmail(`
  * ---
  * email:
  *   subject: Hello!

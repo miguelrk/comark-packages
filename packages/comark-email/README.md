@@ -23,7 +23,7 @@ pnpm add comark-email
 ```typescript
 import { renderEmail } from 'comark-email'
 
-const { html, subject, previewText } = await renderEmail(`
+const { html, text, subject, previewText } = await renderEmail(`
 ---
 email:
   subject: "Your order has shipped!"
@@ -41,7 +41,7 @@ Track Package
 `)
 
 // Pass html directly to your email provider
-await sendEmail({ to: user.email, subject, html })
+await sendEmail({ to: user.email, subject, html, text })
 ```
 
 ### Reusable renderer
@@ -126,6 +126,6 @@ Custom components unknown to the email renderer are rendered via `@comark/html` 
 
 | Entry | Exports |
 |---|---|
-| `comark-email` | `createEmailRenderer`, `renderEmail`, `renderEmailFromDocument`, `documentToMjml`, `compileMjml`, types |
-| `comark-email/render` | `renderEmailFromDocument`, `documentToMjml`, `compileMjml`, `documentToMjmlJson`, `serializeMjml` |
+| `comark-email` | `createEmailRenderer`, `renderEmail`, `renderEmailFromDocument`, `documentToMjml`, `documentToText`, `compileMjml`, types |
+| `comark-email/render` | `renderEmailFromDocument`, `documentToMjml`, `documentToText`, `compileMjml`, `documentToMjmlJson`, `serializeMjml` |
 | `comark-email/config` | `resolveEmailConfig`, `buildMjmlHead` |

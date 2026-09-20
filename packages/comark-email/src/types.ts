@@ -49,6 +49,8 @@ export interface MjmlCompileError {
 export interface EmailRenderResult {
   /** Compiled, inline-styled HTML ready to pass to an email service provider. */
   html: string
+  /** Plain text derived from the document nodes. */
+  text: string
   /** Subject line extracted from frontmatter.email.subject or options.email.subject. */
   subject?: string
   /** Preview text extracted from frontmatter.email.previewText or options.email.previewText. */

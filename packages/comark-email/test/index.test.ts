@@ -7,6 +7,7 @@ describe('renderEmail', () => {
   it('returns an object with html, subject, previewText, and errors', async () => {
     const result = await renderEmail('# Hello')
     expect(result).toHaveProperty('html')
+    expect(result).toHaveProperty('text')
     expect(result).toHaveProperty('errors')
     expect(Array.isArray(result.errors)).toBe(true)
   })

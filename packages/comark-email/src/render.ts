@@ -1,12 +1,14 @@
 import type { MarkdownDocument } from 'comark'
 import { compileMjml } from './mjml.ts'
 import { resolveEmailConfig } from './config.ts'
+import { documentToText } from './text.ts'
 import { documentToMjmlJson } from './transform.ts'
 import { serializeMjml } from './serialize.ts'
 import type { EmailRendererOptions, EmailRenderResult } from './types.ts'
 
 export { compileMjml } from './mjml.ts'
 export { documentToMjmlJson } from './transform.ts'
+export { documentToText } from './text.ts'
 export { serializeMjml } from './serialize.ts'
 
 /**
@@ -16,7 +18,7 @@ export { serializeMjml } from './serialize.ts'
  *   1. Resolve EmailConfig from frontmatter and options.
  *   2. Build the MJML JSON tree with documentToMjmlJson.
  *   3. Compile to HTML with compileMjml (mjml2html).
- *   4. Return { html, subject, previewText, errors }.
+ *   4. Return { html, text, subject, previewText, errors }.
  *
  * @example
  * ```typescript
@@ -39,6 +41,7 @@ export const renderEmailFromDocument = async (
 
   return {
     html,
+    text: documentToText(document),
     subject: emailConfig.subject,
     previewText: emailConfig.previewText,
     errors,
