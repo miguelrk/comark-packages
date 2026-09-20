@@ -1,6 +1,6 @@
 import { Row, Text, PageNumber, PageCount } from '@jasy/pdf'
 import type { PDFElement } from '@jasy/pdf'
-import type { PdfMargin, PdfPageConfig, PdfRendererOptions } from './types.ts'
+import type { PdfChrome, PdfMargin, PdfPageConfig, PdfRendererOptions } from './types.ts'
 
 /** Convert a CSS length string or bare points number to PDF points (1 pt = 1/72 in). */
 export const parseLengthToPt = (val: string | number): number => {
@@ -114,9 +114,23 @@ export interface JasyPageProps {
   margin?: number | { top?: number; right?: number; bottom?: number; left?: number }
   justify?: PdfPageConfig['justify']
   align?: PdfPageConfig['align']
+}
+
+export type PageChrome = {
   header?: PDFElement
   footer?: PDFElement
+  watermark?: PDFElement
 }
+
+/** One chrome slot: host elements replace compiled string templates. */
+export const resolvePageChrome = (
+  pdf: PdfPageConfig = {},
+  chrome?: PdfChrome,
+): PageChrome => ({
+  header: chrome?.header ?? buildHeader(pdf),
+  footer: chrome?.footer ?? buildFooter(pdf),
+  watermark: chrome?.watermark,
+})
 
 export interface JasyDocumentOptions {
   font?: string | string[]
@@ -162,8 +176,6 @@ export const pdfConfigToPageProps = (pdf: PdfPageConfig = {}): JasyPageProps => 
     margin: margin !== undefined ? resolveJasyMargin(margin) : parseLengthToPt('20mm'),
     justify,
     align,
-    header: buildHeader(pdf),
-    footer: buildFooter(pdf),
   }
 }
 

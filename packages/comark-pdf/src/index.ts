@@ -24,6 +24,7 @@ export {
   pdfConfigToDocumentOptions,
   pdfConfigToRenderOptions,
   resolveContentGap,
+  resolvePageChrome,
   resolveJasyMargin,
   resolveJasySize,
   resolveJasyCustomSize,

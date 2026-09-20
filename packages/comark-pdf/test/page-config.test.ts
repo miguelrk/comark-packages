@@ -6,6 +6,7 @@ import {
   pdfConfigToRenderOptions,
   resolveContentGap,
   resolveJasyMargin,
+  resolvePageChrome,
 } from '../src/page.ts'
 
 describe('parseLengthToPt', () => {
@@ -127,6 +128,29 @@ describe('pdfConfigToRenderOptions', () => {
   it('includes fonts from the renderer', () => {
     const fonts = { Script: new Uint8Array([1, 2, 3]) }
     expect(pdfConfigToRenderOptions({}, fonts)?.fonts).toBe(fonts)
+  })
+})
+
+describe('resolvePageChrome', () => {
+  it('compiles string templates when chrome is omitted', () => {
+    const chrome = resolvePageChrome({ header: 'Report', footer: 'Page {{ page }}' })
+    expect(chrome.header).toBeDefined()
+    expect(chrome.footer).toBeDefined()
+    expect(chrome.watermark).toBeUndefined()
+  })
+
+  it('lets chrome elements replace compiled strings', async () => {
+    const { Text } = await import('@jasy/pdf')
+    const header = Text('Letterhead')
+    const footer = Text('Legal')
+    const watermark = Text('Draft')
+    const chrome = resolvePageChrome(
+      { header: 'Report', footer: 'Company' },
+      { header, footer, watermark },
+    )
+    expect(chrome.header).toBe(header)
+    expect(chrome.footer).toBe(footer)
+    expect(chrome.watermark).toBe(watermark)
   })
 })
 

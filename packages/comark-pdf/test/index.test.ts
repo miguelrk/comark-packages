@@ -128,6 +128,18 @@ describe('chrome and visuals', () => {
     expect(isPdf(bytes)).toBe(true)
   })
 
+  it('lets chrome replace string header templates', async () => {
+    const { Text } = await import('@jasy/pdf')
+    const bytes = await renderPdf('# Body', {
+      pdf: { header: 'String header', footer: 'String footer' },
+      chrome: {
+        header: Text('Letterhead'),
+        footer: Text('Legal'),
+      },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
   it('maps headings from visuals faces', async () => {
     const bytes = await renderPdf('# Title\n\n## Section\n\nBody', {
       visuals: {

@@ -57,6 +57,7 @@ export type PdfVisuals = {
 export type PdfChrome = {
   header?: PDFElement
   footer?: PDFElement
+  /** Page overlay. Pass a Positioned element. It is not part of the header band. */
   watermark?: PDFElement
 }
 
@@ -116,9 +117,11 @@ export interface PdfPageConfig {
   onOverflow?: PdfOverflowPolicy
   encrypt?: PdfEncryptOptions
 
+  /** Compiles to chrome.header unless chrome.header is set. */
   header?: string
   headerLeft?: string
   headerRight?: string
+  /** Compiles to chrome.footer unless chrome.footer is set. */
   footer?: string
   footerLeft?: string
   footerRight?: string

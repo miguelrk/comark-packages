@@ -1,5 +1,5 @@
 import { Document, Page, Column, renderToBytes } from '@jasy/pdf'
-import type { JasyDocument, PageOptions, RenderOptions } from '@jasy/pdf'
+import type { JasyDocument, PageOptions, PDFElement, RenderOptions } from '@jasy/pdf'
 import type { MarkdownDocument } from 'comark'
 import { astToJasy } from './jasy.ts'
 import {
@@ -7,6 +7,7 @@ import {
   pdfConfigToPageProps,
   pdfConfigToRenderOptions,
   resolveContentGap,
+  resolvePageChrome,
 } from './page.ts'
 import type { PdfPageConfig, PdfRendererOptions } from './types.ts'
 
@@ -41,16 +42,14 @@ export const renderPdfDocument = (
 
   const nodes = astToJasy(document.nodes, options?.components, textDefaults, options?.visuals)
   const content = nodes.length > 0 ? nodes : []
+  const chrome = resolvePageChrome(pdfConfig, options?.chrome)
+  const body: PDFElement[] = [Column({ gap }, content)]
+  if (chrome.watermark) body.unshift(chrome.watermark)
 
-  if (options?.chrome?.header) pageProps.header = options.chrome.header
-  if (options?.chrome?.footer) pageProps.footer = options.chrome.footer
-  if (options?.chrome?.watermark) {
-    pageProps.header = pageProps.header
-      ? Column([options.chrome.watermark, pageProps.header])
-      : options.chrome.watermark
-  }
-
-  const page = Page(pageProps as PageOptions, [Column({ gap }, content)])
+  const page = Page(
+    { ...pageProps, header: chrome.header, footer: chrome.footer } as PageOptions,
+    body,
+  )
 
   return documentOpts ? Document(documentOpts, [page]) : Document([page])
 }

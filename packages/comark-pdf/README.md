@@ -83,10 +83,12 @@ handle.revoke()
 
 | Option | Type | Description |
 | --- | --- | --- |
-| `pdf` | `PdfPageConfig` | Page size, margins, typography, metadata, headers / footers |
+| `pdf` | `PdfPageConfig` | Page size, margins, typography, metadata. String `header` / `footer` compile into chrome. |
+| `chrome` | `PdfChrome` | Page header, footer, and watermark elements. Replaces compiled string templates. |
+| `visuals` | `PdfVisuals` | Print faces and table / quote / image map |
 | `plugins` | `ComarkPlugin[]` | Parser plugins (math, mermaid, binding, …) |
 | `components` | `Record<string, JasyComponentFn>` | Custom jasy component factories by tag name |
-| `fonts` | `Record<string, Uint8Array \| FontFaces>` | Custom font binaries for jasy |
+| `fonts` | `Record<string, Uint8Array \| FontFaces>` | Font paths or bytes; registered with `addFont` |
 
 Also accepts Comark `ParserOptions` (`autoClose`, `linkify`, `registerDefaultPlugins`, …).
 
@@ -117,7 +119,7 @@ pdf:
   lang: en-US
   accessible: false
   onOverflow: error   # error | warn | ignore
-  header: "My Report" # center header; tokens: {{ page }}, {{ totalPages }}
+  header: "My Report" # compiles to chrome.header; tokens: {{ page }}, {{ totalPages }}
   headerLeft: "Draft"
   headerRight: "Confidential"
   footer: "Page {{ page }} of {{ totalPages }}"
@@ -125,6 +127,8 @@ pdf:
   footerRight: "2026"
 ---
 ```
+
+`margin` is the paper inset only. Header and footer sit inside that box and take their own height. Do not add chrome height into `margin`. Pass `chrome.header` / `chrome.footer` to replace the compiled strings. Pass `chrome.watermark` as a `Positioned` overlay; it is not part of the header band.
 
 Length values accept `mm`, `cm`, `in`, `pt`, `px`, or a bare number (treated as points).
 
