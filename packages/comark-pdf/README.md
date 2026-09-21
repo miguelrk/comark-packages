@@ -150,18 +150,22 @@ const bytes = await renderPdf(markdown, {
 
 ## Feature support
 
-**Supported:** headings, paragraphs, bold / italic / strikethrough, links, lists, blockquotes, rules, tables, page size and margins, headers / footers with `{{ page }}` / `{{ totalPages }}` tokens, `::page-break`, multi-page flow, browser `mount`, Node file export.
+**Supported:** headings, paragraphs, bold / italic / strikethrough, links, lists, blockquotes, rules, tables, SVG nodes, `::if` / `::for` / `::include` bindings, custom jasy components, page size and margins, headers / footers with `{{ page }}` / `{{ totalPages }}` tokens, `::page-break`, multi-page flow, browser `mount`, Node file export.
+
+`visuals.image: 'embed'` passes a local file path or bytes to jasy `Image`. Default markdown images stay as alt-text.
 
 **Degraded (source kept, no rich visual):**
 
 | Feature | PDF output | Reason |
 | ------- | ---------- | ------ |
-| Code blocks (Shiki / rangi) | Monospace text in a tinted box | Highlighters emit HTML |
-| Math (KaTeX) | LaTeX source as monospace text | KaTeX emits HTML |
-| Mermaid | Diagram source as monospace block | Mermaid emits SVG |
-| Images | Alt-text placeholder | Remote URL fetch not wired |
+| Code blocks (Shiki / rangi) | Monospace text in a tinted box | Highlighters emit HTML token trees; we do not map tokens to colored `span`s |
+| Math (KaTeX) | LaTeX source as monospace text | KaTeX emits HTML; SVG / MathML is not wired |
+| Mermaid | Diagram source as a monospace block | Plugin does not pass Mermaid SVG into jasy `Svg()` yet |
+| Images (default) | Alt-text placeholder | HTTP(S) URL fetch is not wired. Inline `img` always stays alt-text |
 
-**Not yet:** raw HTML blocks as layout, full footnote chrome, checkbox glyphs.
+**Not yet:** raw HTML blocks as layout, footnote chrome (raised markers + notes at the page foot), GFM task-list / checkbox glyphs.
+
+Most of those gaps are mapper work in this package. jasy already has `Svg`, colored `span`s, `verticalAlign` on spans, `Checkbox`, and `Image` from a path or bytes. What we still miss on the jasy side is mainly HTTP(S) image load (fonts already have `addFontFromUrl`) and a first-class footnote / endnote region.
 
 ## Plugins
 
