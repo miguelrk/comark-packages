@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
 import { createEmailRenderer, renderEmail, renderEmailFromDocument } from '../src/index.ts'
+import { interpolateBindings } from '../src/binding.ts'
 import { BASIC_EMAIL_MARKDOWN, ADVANCED_EMAIL_MARKDOWN } from './fixtures/markdown.ts'
 
 describe('renderEmail', () => {
@@ -133,5 +134,43 @@ describe('renderEmailFromDocument', () => {
     const { subject, previewText } = await renderEmailFromDocument(doc)
     expect(subject).toBe('Hello from Comark')
     expect(previewText).toBe('This is the email preview text.')
+  })
+})
+
+describe('binding', () => {
+  it('interpolates {{ }} from data', async () => {
+    const { html } = await renderEmail('Hello {{ data.name }}', {
+      data: { name: 'Ada' },
+    })
+    expect(html).toContain('Ada')
+  })
+
+  it('renders ::if with eq', async () => {
+    const { html } = await renderEmail([
+      '::if{:value="data.audience" eq="client"}',
+      'Client body',
+      '::',
+    ].join('\n'), {
+      data: { audience: 'client' },
+    })
+    expect(html).toContain('Client body')
+  })
+
+  it('repeats ::for items', async () => {
+    const { html } = await renderEmail([
+      '::for{:each="data.items" item="item"}',
+      '- {{ props.item }}',
+      '::',
+    ].join('\n'), {
+      data: { items: ['One', 'Two'] },
+    })
+    expect(html).toContain('One')
+    expect(html).toContain('Two')
+  })
+
+  it('resolves || as a second path, then as a literal', () => {
+    const scope = { data: { tradeName: { es: 'Graficoat', en: '' } } }
+    expect(interpolateBindings('{{ data.tradeName.en || data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.missing || N/A }}', scope)).toBe('N/A')
   })
 })

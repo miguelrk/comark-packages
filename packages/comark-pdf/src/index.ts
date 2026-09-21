@@ -1,9 +1,12 @@
 import { createMarkdownParser } from 'comark'
+import binding from 'comark/plugins/binding'
+import { pdfBindingComponents } from './binding.ts'
 import { PageBreak } from './plugins/page-break.ts'
 import { renderPdfBytes } from './render.ts'
 import type { PdfRendererOptions } from './types.ts'
 
 export { renderPdfDocument, renderPdfBytes, renderPdfFromDocument } from './render.ts'
+export { pdfBindingComponents, Include } from './binding.ts'
 export type {
   PdfChrome,
   PdfEncryptOptions,
@@ -31,13 +34,14 @@ export {
   parseLengthToPt,
 } from './page.ts'
 
-const mergeComponents = (options?: PdfRendererOptions): PdfRendererOptions => ({
+const mergePdfOptions = (options?: PdfRendererOptions): PdfRendererOptions => ({
   ...options,
-  components: { 'page-break': PageBreak, ...options?.components },
+  plugins: [binding(), ...(options?.plugins ?? [])],
+  components: { ...pdfBindingComponents, 'page-break': PageBreak, ...options?.components },
 })
 
 export const createPdfRenderer = (options?: PdfRendererOptions): ((markdown: string) => Promise<Uint8Array>) => {
-  const merged = mergeComponents(options)
+  const merged = mergePdfOptions(options)
   const parseMarkdown = createMarkdownParser(merged)
   return async (markdown: string) => {
     const document = await parseMarkdown(markdown)

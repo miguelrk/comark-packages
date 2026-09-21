@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
-import { createPdfRenderer, renderPdf, renderPdfFromDocument } from '../src/index.ts'
+import { createPdfRenderer, renderPdf, renderPdfFromDocument, Include } from '../src/index.ts'
+import { interpolateBindings } from '../src/binding.ts'
 import math, { Math as MathComponent } from '../src/plugins/math.ts'
 import { PageBreak } from '../src/plugins/page-break.ts'
 import { BASIC_MARKDOWN, ADVANCED_MARKDOWN } from './fixtures/markdown.ts'
@@ -170,5 +171,52 @@ describe('chrome and visuals', () => {
   it('renders svg nodes', async () => {
     const bytes = await renderPdf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="100%" height="100%"><rect width="10" height="10"/></svg>')
     expect(isPdf(bytes)).toBe(true)
+  })
+})
+
+describe('binding', () => {
+  it('interpolates {{ }} from data', async () => {
+    const bytes = await renderPdf('Hello {{ data.name }}', {
+      data: { name: 'Ada' },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('renders ::if and #else', async () => {
+    const bytes = await renderPdf([
+      '::if{:value="data.show"}',
+      'Shown',
+      '#else',
+      'Hidden',
+      '::',
+    ].join('\n'), {
+      data: { show: true },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('repeats ::for items', async () => {
+    const bytes = await renderPdf([
+      '::for{:each="data.items" item="item"}',
+      '{{ props.item.label }}',
+      '::',
+    ].join('\n'), {
+      data: { items: [{ label: 'A' }, { label: 'B' }] },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('includes ::include', async () => {
+    const bytes = await renderPdf('::include{:value="data.content"}\n::', {
+      data: { content: '## Section\n\nBody' },
+      components: { include: Include },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('resolves || as a second path, then as a literal', () => {
+    const scope = { data: { tradeName: { es: 'Graficoat', en: '' } } }
+    expect(interpolateBindings('{{ data.tradeName.en || data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.missing || N/A }}', scope)).toBe('N/A')
   })
 })

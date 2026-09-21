@@ -1,6 +1,14 @@
 import type { Node, ElementNode, MarkdownDocument } from 'comark'
 import { renderHtmlFromDocument } from '@comark/html/render'
 import type { EmailConfig, EmailRendererOptions, MjmlNode } from './types.ts'
+import {
+  resolveBoundAttrs,
+  resolveForIterations,
+  resolvePath,
+  selectForBranch,
+  selectIfBranch,
+  shouldRenderIf,
+} from './binding.ts'
 import { buildMjmlHead } from './config.ts'
 import { emailButtonToMjml } from './plugins/email-button.ts'
 import { emailColumnsToMjml } from './plugins/email-columns.ts'
@@ -27,13 +35,48 @@ const HEADING_WEIGHTS: Record<string, string> = {
 // Tags rendered inline inside mj-text content (not as standalone MJML nodes).
 const INLINE_TAGS = new Set(['strong', 'em', 'del', 'code', 'a', 'br', 'span'])
 
+const scopeOf = (options?: EmailRendererOptions) => ({
+  data: options?.data,
+  frontmatter: options?.frontmatter,
+  props: options?.props,
+})
+
+const escapeHtml = (value: string): string =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+const htmlOptions = (options?: EmailRendererOptions): EmailRendererOptions => ({
+  ...options,
+  components: {
+    Binding: (node) => {
+      const attrs = (node[1] || {}) as Record<string, unknown>
+      const path = attrs[':value']
+      const resolved = typeof path === 'string' ? resolvePath(path, scopeOf(options)) : attrs.value
+      const out = resolved ?? attrs.defaultValue
+      return out == null ? '' : escapeHtml(String(out))
+    },
+    ...options?.components,
+  },
+})
+
 const renderInlineHtml = (children: Node[], options?: EmailRendererOptions): Promise<string> => {
   if (children.length === 0) return Promise.resolve('')
-  return renderHtmlFromDocument({ nodes: children }, options)
+  return renderHtmlFromDocument({ nodes: children }, htmlOptions(options))
 }
 
 const renderNodeHtml = (node: Node, options?: EmailRendererOptions): Promise<string> =>
-  renderHtmlFromDocument({ nodes: [node] }, options)
+  renderHtmlFromDocument({ nodes: [node] }, htmlOptions(options))
+
+const mapBranch = async (
+  children: Node[],
+  options?: EmailRendererOptions,
+): Promise<MjmlNode[]> => {
+  const out: MjmlNode[] = []
+  for (const child of children) {
+    const mapped = await nodeToColumnChildren(child, options)
+    if (mapped) out.push(...mapped)
+  }
+  return out
+}
 
 const isSoloImage = (node: ElementNode): boolean => {
   const children = node.slice(2) as Node[]
@@ -58,8 +101,25 @@ export const nodeToColumnChildren = async (node: Node, options?: EmailRendererOp
   // Comment nodes — skip
   if (node[0] === null) return []
 
-  const [tag, attrs] = node as ElementNode
+  const [tag, rawAttrs] = node as ElementNode
+  const attrs = resolveBoundAttrs(rawAttrs ?? {}, scopeOf(options))
   const children = (node as ElementNode).slice(2) as Node[]
+
+  if (tag === 'if') {
+    const branch = selectIfBranch(children, shouldRenderIf(attrs))
+    return branch?.length ? mapBranch(branch, options) : []
+  }
+
+  if (tag === 'for') {
+    const iterations = resolveForIterations(attrs, options?.props ?? {})
+    const branch = selectForBranch(children, iterations.length === 0)
+    if (!iterations.length) return mapBranch(branch, options)
+    const out: MjmlNode[] = []
+    for (const iteration of iterations) {
+      out.push(...await mapBranch(branch, { ...options, props: iteration.props }))
+    }
+    return out
+  }
 
   // email-columns needs its own section — signal the caller.
   if (tag === 'email-columns') return null

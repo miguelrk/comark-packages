@@ -1,4 +1,5 @@
 import { createMarkdownParser } from 'comark'
+import binding from 'comark/plugins/binding'
 import { renderEmailFromDocument } from './render.ts'
 import type { EmailRendererOptions, EmailRenderResult } from './types.ts'
 
@@ -33,7 +34,10 @@ export type {
 export const createEmailRenderer = (
   options?: EmailRendererOptions
 ): ((markdown: string) => Promise<EmailRenderResult>) => {
-  const parseMarkdown = createMarkdownParser(options)
+  const parseMarkdown = createMarkdownParser({
+    ...options,
+    plugins: [binding(), ...(options?.plugins ?? [])],
+  })
   return async (markdown: string) => {
     const document = await parseMarkdown(markdown)
     return renderEmailFromDocument(document, options)

@@ -36,12 +36,16 @@ export const renderEmailFromDocument = async (
   const frontmatter = (document as MarkdownDocument).frontmatter ?? {}
   const emailConfig = resolveEmailConfig(frontmatter, options)
 
-  const mjmlJson = await documentToMjmlJson(document, { ...options, email: emailConfig })
+  const mjmlJson = await documentToMjmlJson(document, { ...options, email: emailConfig, frontmatter })
   const { html, errors } = await compileMjml(mjmlJson, options?.mjmlOptions)
 
   return {
     html,
-    text: documentToText(document),
+    text: documentToText(document, {
+      data: options?.data,
+      frontmatter,
+      props: options?.props,
+    }),
     subject: emailConfig.subject,
     previewText: emailConfig.previewText,
     errors,
@@ -59,6 +63,6 @@ export const documentToMjml = async (
 ): Promise<string> => {
   const frontmatter = (document as MarkdownDocument).frontmatter ?? {}
   const emailConfig = resolveEmailConfig(frontmatter, options)
-  const mjmlJson = await documentToMjmlJson(document, { ...options, email: emailConfig })
+  const mjmlJson = await documentToMjmlJson(document, { ...options, email: emailConfig, frontmatter })
   return serializeMjml(mjmlJson)
 }

@@ -1,6 +1,9 @@
 import { Document, Page, Column, renderToBytes } from '@jasy/pdf'
 import type { JasyDocument, PageOptions, PDFElement, RenderOptions } from '@jasy/pdf'
+import { createMarkdownParser } from 'comark'
 import type { MarkdownDocument } from 'comark'
+import binding from 'comark/plugins/binding'
+import { pdfBindingComponents } from './binding.ts'
 import { astToJasy } from './jasy.ts'
 import {
   pdfConfigToDocumentOptions,
@@ -19,10 +22,10 @@ const resolvePdfConfig = (
   return { ...frontmatterPdf, ...options?.pdf }
 }
 
-export const renderPdfDocument = (
+export const renderPdfDocument = async (
   document: MarkdownDocument | { nodes: MarkdownDocument['nodes'] },
   options?: PdfRendererOptions,
-): JasyDocument => {
+): Promise<JasyDocument> => {
   const pdfConfig = resolvePdfConfig(document, options)
   const pageProps = pdfConfigToPageProps(pdfConfig)
   const documentOpts = pdfConfigToDocumentOptions(pdfConfig)
@@ -40,7 +43,21 @@ export const renderPdfDocument = (
       }
     : undefined
 
-  const nodes = astToJasy(document.nodes, options?.components, textDefaults, options?.visuals)
+  const parseMarkdown = createMarkdownParser({
+    ...options,
+    plugins: [binding(), ...(options?.plugins ?? [])],
+  })
+  const nodes = await astToJasy(
+    document.nodes,
+    { ...pdfBindingComponents, ...options?.components },
+    textDefaults,
+    options?.visuals,
+    {
+      data: options?.data,
+      frontmatter: (document as MarkdownDocument).frontmatter,
+      parseMarkdown,
+    },
+  )
   const content = nodes.length > 0 ? nodes : []
   const chrome = resolvePageChrome(pdfConfig, options?.chrome)
   const body: PDFElement[] = [Column({ gap }, content)]
@@ -63,7 +80,7 @@ export const renderPdfBytes = async (
     ...pdfConfigToRenderOptions(pdfConfig),
     ...(options?.onMissingGlyphs ? { onMissingGlyphs: options.onMissingGlyphs } : {}),
   } as RenderOptions | undefined
-  const doc = renderPdfDocument(document, options)
+  const doc = await renderPdfDocument(document, options)
   if (options?.fonts) {
     for (const [name, faces] of Object.entries(options.fonts)) {
       doc.addFont(name, faces)

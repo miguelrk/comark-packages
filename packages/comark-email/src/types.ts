@@ -37,6 +37,9 @@ export interface EmailRendererOptions extends ParserOptions, RendererOptions {
   mjmlOptions?: MjmlCompileOptions
   /** Additional CSS injected into in the email head via mj-style. */
   headCss?: string
+  data?: Record<string, unknown>
+  props?: Record<string, unknown>
+  frontmatter?: Record<string, unknown>
 }
 
 export interface MjmlCompileError {

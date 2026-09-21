@@ -66,6 +66,12 @@ const doc = await parseMarkdown('---\nemail:\n  subject: Hello\n---\n# Hi')
 const { html, subject } = await renderEmailFromDocument(doc)
 ```
 
+## Locale files
+
+The library does not own template files. Hosts pick one markdown file per locale (`en/`, `es/`). Bind `.en` or `.es` on typed objects. Use `||` for an empty fallback: `{{ data.sheet.tradeName.en || data.sheet.tradeName.es }}`. The right side is a second path first, then a literal.
+
+Do not use `::kv`. Write labels in the locale file. Use `::include` only for a stored markdown string. Do not use `[meta.locale]`.
+
 ## Frontmatter configuration
 
 ```yaml

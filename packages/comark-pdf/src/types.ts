@@ -134,4 +134,5 @@ export interface PdfRendererOptions extends ParserOptions {
   chrome?: PdfChrome
   fonts?: Record<string, PdfFontFaces>
   onMissingGlyphs?: (chars: string[]) => void
+  data?: Record<string, unknown>
 }

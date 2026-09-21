@@ -1,5 +1,6 @@
 import type { PDFElement } from '@jasy/pdf'
-import type { ElementNode, Node } from 'comark'
+import type { ElementNode, MarkdownDocument, Node } from 'comark'
+import type { BindingScope } from './binding.ts'
 import type { PdfFace, PdfVisuals } from './types.ts'
 import {
   Box,
@@ -15,8 +16,14 @@ import {
   Table,
   Text,
 } from '@jasy/pdf'
+import { resolveBindingText, resolveBoundAttrs } from './binding.ts'
 
-export type JasyComponentFn = (element: ElementNode, ctx: JasyMapContext) => PDFElement | null
+export type JasyComponentResult = PDFElement | PDFElement[] | null
+
+export type JasyComponentFn = (
+  element: ElementNode,
+  ctx: JasyMapContext,
+) => JasyComponentResult | Promise<JasyComponentResult>
 
 export interface JasyTextDefaults {
   size?: number
@@ -28,12 +35,15 @@ export interface JasyTextDefaults {
   italic?: boolean
 }
 
-export interface JasyMapContext {
-  mapNodes(nodes: Node[]): PDFElement[]
+export interface JasyMapContext extends BindingScope {
+  mapNodes(nodes: Node[]): Promise<PDFElement[]>
   mapInlineToSpans(nodes: Node[], inheritStyle?: Record<string, unknown>): ReturnType<typeof span>[]
+  withScope(props: Record<string, unknown>): JasyMapContext
+  resolveAttrs(attrs: Record<string, unknown>): Record<string, unknown>
   components?: Record<string, JasyComponentFn>
   textDefaults?: JasyTextDefaults
   visuals?: PdfVisuals
+  parseMarkdown?: (markdown: string) => Promise<Pick<MarkdownDocument, 'nodes'>>
 }
 
 const HEADING_SIZES = [28, 22, 18, 16, 14, 13] as const
@@ -161,7 +171,8 @@ const mapInlineToSpans = (
       continue
     }
 
-    const [tag, attrs, ...children] = node as ElementNode
+    const [tag, rawAttrs, ...children] = node as ElementNode
+    const attrs = resolveBoundAttrs(rawAttrs, ctx)
     const style = { ...inheritStyle }
 
     switch (tag) {
@@ -192,7 +203,11 @@ const mapInlineToSpans = (
         continue
       }
       default: {
-        // Inline custom components: render their text content as a plain span.
+        if (tag === 'binding') {
+          const text = resolveBindingText(rawAttrs, ctx)
+          if (text) result.push(span(text, style))
+          continue
+        }
         if (ctx.components?.[tag as string]) {
           const text = textContent(children)
           if (text) result.push(span(text, style))
@@ -222,10 +237,10 @@ const inlineContent = (
   return spans
 }
 
-const mapListItem = (
+const mapListItem = async (
   children: Node[],
   ctx: JasyMapContext,
-): PDFElement[] => {
+): Promise<PDFElement[]> => {
   if (children.length === 1) {
     const child = children[0]
     if (Array.isArray(child) && (child as ElementNode)[0] === 'p') {
@@ -262,11 +277,11 @@ const unwrapCellNodes = (nodes: Node[]): Node[] => {
   return out
 }
 
-const mapTableCell = (
+const mapTableCell = async (
   cell: Node,
   ctx: JasyMapContext,
   role: 'header' | 'body',
-): PDFElement => {
+): Promise<PDFElement> => {
   const face = ctx.visuals
     ? resolveFace(ctx, role === 'header' ? 'tableHeader' : 'tableBody')
     : undefined
@@ -286,7 +301,7 @@ const mapTableCell = (
   }
   const align = String(attrs.align ?? 'left') as 'left' | 'center' | 'right'
   if (cellHasComponent(children as Node[], ctx)) {
-    const mapped = ctx.mapNodes(unwrapCellNodes(children as Node[]))
+    const mapped = await ctx.mapNodes(unwrapCellNodes(children as Node[]))
     const inner = mapped.length === 0
       ? Text('', style({ align })) as PDFElement
       : mapped.length === 1
@@ -298,14 +313,15 @@ const mapTableCell = (
   return wrapTableCell(Text(content as string, style({ align })) as PDFElement, pad, headerBg)
 }
 
-const mapTableRow = (
+const mapTableRow = async (
   node: ElementNode,
   ctx: JasyMapContext,
   role: 'header' | 'body' = 'body',
-): PDFElement[] =>
-  childrenOf(node)
+): Promise<PDFElement[]> => {
+  const cells = childrenOf(node)
     .filter(c => typeof c === 'string' || (Array.isArray(c) && ['th', 'td'].includes(String((c as ElementNode)[0]))))
-    .map(cell => mapTableCell(cell, ctx, role))
+  return Promise.all(cells.map(cell => mapTableCell(cell, ctx, role)))
+}
 
 const wrapTableCell = (
   text: PDFElement,
@@ -318,19 +334,20 @@ const wrapTableCell = (
   return pad ? Padding(pad, text) as PDFElement : text
 }
 
-const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[] | null => {
+const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement | PDFElement[] | null> => {
   if (typeof node === 'string') {
     const text = node.trim()
     return text ? Text(text, bodyTextStyle(ctx)) as PDFElement : null
   }
 
-  const [tag, attrs, ...children] = node as ElementNode
+  const [tag, rawAttrs, ...children] = node as ElementNode
+  const attrs = resolveBoundAttrs(rawAttrs, ctx)
 
   if (tag === null) return null
 
   const componentFn = ctx.components?.[tag as string]
   if (componentFn) {
-    return componentFn(node as ElementNode, ctx)
+    return componentFn([tag, attrs, ...children] as ElementNode, ctx)
   }
 
   switch (tag) {
@@ -371,7 +388,7 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
 
     case 'p': {
       if (cellHasComponent(children, ctx)) {
-        const mapped = ctx.mapNodes(unwrapCellNodes(children))
+        const mapped = await ctx.mapNodes(unwrapCellNodes(children))
         if (mapped.length === 0) return null
         return (mapped.length === 1 ? mapped[0] : Column({ gap: 2 }, mapped)) as PDFElement
       }
@@ -381,7 +398,7 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
     }
 
     case 'blockquote': {
-      const inner = ctx.mapNodes(children)
+      const inner = await ctx.mapNodes(children)
       if (ctx.visuals) {
         return Box(
           {
@@ -413,37 +430,37 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
       }) as PDFElement
 
     case 'ul': {
-      const items = children.map((child) => {
+      const items = await Promise.all(children.map(async (child) => {
         if (typeof child === 'string') return null
         const [itemTag, , ...itemChildren] = child as ElementNode
         if (itemTag !== 'li') return null
-        const inner = mapListItem(itemChildren, ctx)
+        const inner = await mapListItem(itemChildren, ctx)
         return Row({ gap: 6, align: 'start' }, [
           Text('•', bodyTextStyle(ctx, { color: '#666666' })) as PDFElement,
           Column({ gap: 4 }, inner.length > 0 ? inner : [Text('') as PDFElement]) as PDFElement,
         ]) as PDFElement
-      })
+      }))
       const filteredItems = items.filter((x): x is PDFElement => x !== null)
       return Column({ gap: 6 }, filteredItems.length > 0 ? filteredItems : [Text('') as PDFElement]) as PDFElement
     }
 
     case 'ol': {
-      const items = children.map((child, i) => {
+      const items = await Promise.all(children.map(async (child, i) => {
         if (typeof child === 'string') return null
         const [itemTag, , ...itemChildren] = child as ElementNode
         if (itemTag !== 'li') return null
-        const inner = mapListItem(itemChildren, ctx)
+        const inner = await mapListItem(itemChildren, ctx)
         return Row({ gap: 6, align: 'start' }, [
           Text(`${i + 1}.`, bodyTextStyle(ctx, { color: '#666666' })) as PDFElement,
           Column({ gap: 4 }, inner.length > 0 ? inner : [Text('') as PDFElement]) as PDFElement,
         ]) as PDFElement
-      })
+      }))
       const filteredItems = items.filter((x): x is PDFElement => x !== null)
       return Column({ gap: 6 }, filteredItems.length > 0 ? filteredItems : [Text('') as PDFElement]) as PDFElement
     }
 
     case 'li': {
-      const inner = mapListItem(children, ctx)
+      const inner = await mapListItem(children, ctx)
       return Column({ gap: 4 }, inner.length > 0 ? inner : [Text('') as PDFElement]) as PDFElement
     }
 
@@ -476,19 +493,19 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
         const kvCols = typeof ctx.visuals?.table?.keyValue === 'object'
           ? ctx.visuals.table.keyValue.columns ?? ['auto', '2fr']
           : ['auto', '2fr']
-        const rows = bodyRowNodes.map((rowNode) => {
+        const rows = await Promise.all(bodyRowNodes.map(async (rowNode) => {
           const cells = childrenOf(rowNode).filter(c => Array.isArray(c) || typeof c === 'string')
           return [
-            mapTableCell(cells[0] ?? '', ctx, 'body'),
-            mapTableCell(cells[1] ?? '', ctx, 'body'),
+            await mapTableCell(cells[0] ?? '', ctx, 'body'),
+            await mapTableCell(cells[1] ?? '', ctx, 'body'),
           ]
-        })
+        }))
         return Table({ columns: kvCols, cellPadding: 0, rowGap: 0, colGap: 0 }, rows) as PDFElement
       }
 
-      const headerCells = headerRowNode ? mapTableRow(headerRowNode, ctx, 'header') : undefined
+      const headerCells = headerRowNode ? await mapTableRow(headerRowNode, ctx, 'header') : undefined
       const columns = Array.from({ length: numCols }, () => '1fr' as '1fr')
-      const rows = bodyRowNodes.map((rowNode) => mapTableRow(rowNode, ctx, 'body'))
+      const rows = await Promise.all(bodyRowNodes.map(rowNode => mapTableRow(rowNode, ctx, 'body')))
       const cellPad = ctx.visuals?.table?.cellPad ?? { x: 8, y: 6 }
       const paddedInCells = Boolean(ctx.visuals)
 
@@ -529,7 +546,7 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
     }
 
     case 'a': {
-      const inner = ctx.mapNodes(children)
+      const inner = await ctx.mapNodes(children)
       return (inner.length === 1 ? inner[0] : Column({ gap: 4 }, inner)) as PDFElement
     }
 
@@ -540,17 +557,17 @@ const mapBlockNode = (node: Node, ctx: JasyMapContext): PDFElement | PDFElement[
       return PageBreak() as PDFElement
 
     default: {
-      const inner = ctx.mapNodes(children)
+      const inner = await ctx.mapNodes(children)
       if (inner.length === 0) return null
       return (inner.length === 1 ? inner[0] : Column({ gap: 8 }, inner)) as PDFElement
     }
   }
 }
 
-const mapNodes = (nodes: Node[], ctx: JasyMapContext): PDFElement[] => {
+const mapNodes = async (nodes: Node[], ctx: JasyMapContext): Promise<PDFElement[]> => {
   const result: PDFElement[] = []
   for (const node of nodes) {
-    const mapped = mapBlockNode(node, ctx)
+    const mapped = await mapBlockNode(node, ctx)
     if (mapped === null) continue
     if (Array.isArray(mapped)) result.push(...mapped)
     else result.push(mapped)
@@ -558,18 +575,40 @@ const mapNodes = (nodes: Node[], ctx: JasyMapContext): PDFElement[] => {
   return result
 }
 
+export type JasyBindingOptions = BindingScope & {
+  parseMarkdown?: JasyMapContext['parseMarkdown']
+}
+
+const createMapContext = (
+  components?: Record<string, JasyComponentFn>,
+  textDefaults?: JasyTextDefaults,
+  visuals?: PdfVisuals,
+  binding?: JasyBindingOptions,
+): JasyMapContext => {
+  const ctx: JasyMapContext = {
+    mapNodes: ns => mapNodes(ns, ctx),
+    mapInlineToSpans: (ns, style) => mapInlineToSpans(ns, style ?? {}, ctx),
+    withScope: props => createMapContext(components, textDefaults, visuals, { ...binding, props }),
+    resolveAttrs: attrs => resolveBoundAttrs(attrs, ctx),
+    components,
+    textDefaults,
+    visuals,
+    data: binding?.data,
+    frontmatter: binding?.frontmatter,
+    props: binding?.props,
+    meta: binding?.meta,
+    parseMarkdown: binding?.parseMarkdown,
+  }
+  return ctx
+}
+
 export const astToJasy = (
   nodes: Node[],
   components?: Record<string, JasyComponentFn>,
   textDefaults?: JasyTextDefaults,
   visuals?: PdfVisuals,
-): PDFElement[] => {
-  const ctx: JasyMapContext = {
-    mapNodes: (ns) => mapNodes(ns, ctx),
-    mapInlineToSpans: (ns, style) => mapInlineToSpans(ns, style ?? {}, ctx),
-    components,
-    textDefaults,
-    visuals,
-  }
+  binding?: JasyBindingOptions,
+): Promise<PDFElement[]> => {
+  const ctx = createMapContext(components, textDefaults, visuals, binding)
   return mapNodes(nodes, ctx)
 }
