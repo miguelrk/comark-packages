@@ -44,7 +44,7 @@ export type PdfVisuals = {
     cellPad?: { x: number, y: number }
     headerBg?: string
     rule?: string
-    keyValue?: boolean | { columns?: [string, string] }
+    keyValue?: boolean | { columns?: [string, string], rules?: boolean }
   }
   quote?: {
     pad?: PdfFace['pad']

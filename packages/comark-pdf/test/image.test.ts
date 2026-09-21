@@ -1,3 +1,4 @@
+import { inflateSync } from 'node:zlib'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderPdf } from '../src/index.ts'
 import { IMAGE_FETCH_MAX_BYTES, resolveImageSrc } from '../src/image.ts'
@@ -73,8 +74,22 @@ describe('renderPdf image embed', () => {
   })
 
   it('embeds an inline image in a paragraph', async () => {
-    const bytes = await renderPdf(`Before ![dot](${DATA_URI}) after`, { visuals: { image: 'embed' } })
+    const bytes = await renderPdf(`Before ![dot](${DATA_URI}){width="12" height="12"} after`, { visuals: { image: 'embed' } })
     expect(isPdf(bytes)).toBe(true)
+    const raw = Buffer.from(bytes)
+    const streams: Buffer[] = []
+    const re = /stream\r?\n([\s\S]*?)\r?\nendstream/g
+    let match: RegExpExecArray | null
+    while ((match = re.exec(raw.toString('latin1'))) !== null) {
+      const body = Buffer.from(match[1]!, 'latin1')
+      try { streams.push(inflateSync(body)) }
+      catch { /* font or other streams */ }
+    }
+    const text = Buffer.concat(streams).toString('latin1')
+    const beforeY = /([\d.]+) ([\d.]+) Td \[\(Bef\)/.exec(text)?.[2]
+    const afterY = /([\d.]+) ([\d.]+) Td \( after\)/.exec(text)?.[2]
+    expect(beforeY).toBeTruthy()
+    expect(afterY).toBe(beforeY)
   })
 
   it('keeps alt-text when embed is off', async () => {

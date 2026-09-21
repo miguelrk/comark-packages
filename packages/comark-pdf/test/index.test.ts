@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
 import rangi from 'comark/plugins/rangi'
-import { createPdfRenderer, renderPdf, renderPdfFromDocument, Include } from '../src/index.ts'
-import { interpolateBindings, resolveBindingText } from '../src/binding.ts'
+import { createPdfRenderer, renderPdf, renderPdfFromDocument } from '../src/index.ts'
+import { interpolateBindings, resolveBindingText, selectIfBranch } from '../src/binding.ts'
 import math, { Math as MathComponent } from '../src/plugins/math.ts'
 import mermaid, { Mermaid } from '../src/plugins/mermaid.ts'
 import { PageBreak } from '../src/plugins/page-break.ts'
@@ -81,6 +81,17 @@ describe('renderPdf', () => {
       components: { Math: MathComponent },
     })
     expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('embeds math SVG when the component is registered as Math', async () => {
+    const source = '$E=mc^2$'
+    const plain = await renderPdf(source)
+    const bytes = await renderPdf(source, {
+      plugins: [math()],
+      components: { Math: MathComponent },
+    })
+    expect(isPdf(bytes)).toBe(true)
+    expect(bytes.length).toBeGreaterThan(plain.length)
   })
 
   it('renders mermaid as SVG or source fallback', async () => {
@@ -222,6 +233,16 @@ describe('binding', () => {
     expect(isPdf(bytes)).toBe(true)
   })
 
+  it('keeps only the matching #else branch', () => {
+    const children = ['Shown.\n#else\nHidden.']
+    const shown = JSON.stringify(selectIfBranch(children, true))
+    const hidden = JSON.stringify(selectIfBranch(children, false))
+    expect(shown).toContain('Shown')
+    expect(shown).not.toContain('Hidden')
+    expect(hidden).toContain('Hidden')
+    expect(hidden).not.toContain('Shown')
+  })
+
   it('repeats ::for items', async () => {
     const bytes = await renderPdf([
       '::for{:each="data.items" item="item"}',
@@ -236,7 +257,6 @@ describe('binding', () => {
   it('includes ::include', async () => {
     const bytes = await renderPdf('::include{:value="data.content"}\n::', {
       data: { content: '## Section\n\nBody' },
-      components: { include: Include },
     })
     expect(isPdf(bytes)).toBe(true)
   })

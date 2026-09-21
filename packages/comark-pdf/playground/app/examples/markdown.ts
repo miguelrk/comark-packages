@@ -1,4 +1,4 @@
-const PNG_DOT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+const PNG_DOT = 'iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAIAAABuYg/PAAAAUElEQVR42mMQCVhFN8QwatmoZaOWjVjLPtz2x0TUtwyrNWRYyUC5TcTbN5gsI9ImIu0btWzUsiFj2fDN1PQuG+ld6o/W1KOWjVo2atnAWwYASO4hR8pAqkgAAAAASUVORK5CYII='
 const PNG_URI = `data:image/png;base64,${PNG_DOT}`
 
 export const markdownSample = `---
@@ -135,7 +135,7 @@ flowchart LR
 
 ## Images
 
-\`visuals.image: embed\` resolves a data URI, a local path, or HTTP(S). Failure stays alt-text. An inline image splits the paragraph into a column.
+\`visuals.image: embed\` resolves a data URI, a local path, or HTTP(S). Failure stays alt-text. An inline image stays on the same line as the text.
 
 Block:
 

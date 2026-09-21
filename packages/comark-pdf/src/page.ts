@@ -1,4 +1,4 @@
-import { Row, Text, PageNumber, PageCount } from '@jasy/pdf'
+import { PageBuilder, Row, Text } from '@jasy/pdf'
 import type { PDFElement } from '@jasy/pdf'
 import type { PdfChrome, PdfMargin, PdfPageConfig, PdfRendererOptions } from './types.ts'
 
@@ -48,26 +48,23 @@ export const resolveJasyCustomSize = (width: string, height: string): JasySize =
   unit: 'pt',
 })
 
+const fillPageTemplate = (
+  template: string,
+  pageNumber: number,
+  pageCount: number,
+) => template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_match, token: string) => {
+  if (token === 'page') return String(pageNumber)
+  if (token === 'totalPages') return String(pageCount)
+  return `{{ ${token} }}`
+})
+
 const buildPageTemplate = (template: string, style: Record<string, unknown> = {}): PDFElement[] => {
-  const result: PDFElement[] = []
-  const re = /\{\{\s*(\w+)\s*\}\}/g
-  let last = 0
-  let match: RegExpExecArray | null
-
-  while ((match = re.exec(template)) !== null) {
-    if (match.index > last) {
-      result.push(Text(template.slice(last, match.index), { size: 9, ...style }))
-    }
-    const token = match[1]
-    if (token === 'page') result.push(PageNumber({ size: 9, ...style }) as PDFElement)
-    else if (token === 'totalPages') result.push(PageCount({ size: 9, ...style }) as PDFElement)
-    else result.push(Text(`{{ ${token} }}`, { size: 9, ...style }) as PDFElement)
-    last = match.index + match[0].length
+  if (!/\{\{\s*(?:page|totalPages)\s*\}\}/.test(template)) {
+    return [Text(template, { size: 9, ...style }) as PDFElement]
   }
-
-  const remaining = template.slice(last)
-  if (remaining) result.push(Text(remaining, { size: 9, ...style }) as PDFElement)
-  return result
+  return [PageBuilder(({ pageNumber, pageCount }) =>
+    Text(fillPageTemplate(template, pageNumber, pageCount), { size: 9, ...style }),
+  ) as PDFElement]
 }
 
 const buildHeader = (pdf: PdfPageConfig): PDFElement | undefined => {

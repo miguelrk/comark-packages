@@ -124,10 +124,14 @@ const slotName = (attrs: Record<string, unknown>): string | undefined => {
     ?? (slotKey?.startsWith('#') ? slotKey.slice(1) : slotKey?.slice(7))
 }
 
+const ELSE_LINE = /(?:^|\n)[ \t]*#else[ \t]*(?:\n|$)/
+
 export const selectIfBranch = (children: Node[], matches: boolean): Node[] | undefined => {
-  const regularChildren: Node[] = []
+  const thenNodes: Node[] = []
+  const elseNodes: Node[] = []
   let defaultSlot: Node[] | undefined
   let elseSlot: Node[] | undefined
+  let seenElse = false
   for (const child of children) {
     if (Array.isArray(child) && child[0] === 'template') {
       const name = slotName(child[1] as Record<string, unknown>)
@@ -137,9 +141,26 @@ export const selectIfBranch = (children: Node[], matches: boolean): Node[] | und
         continue
       }
     }
-    regularChildren.push(child)
+    if (seenElse) {
+      elseNodes.push(child)
+      continue
+    }
+    if (typeof child === 'string') {
+      const mark = ELSE_LINE.exec(child)
+      if (mark) {
+        const before = child.slice(0, mark.index)
+        const after = child.slice(mark.index + mark[0].length)
+        if (before) thenNodes.push(before)
+        if (after) elseNodes.push(after)
+        seenElse = true
+        continue
+      }
+    }
+    thenNodes.push(child)
   }
-  return matches ? (defaultSlot ?? regularChildren) : elseSlot
+  const thenBranch = defaultSlot ?? thenNodes
+  const elseBranch = elseSlot ?? (seenElse ? elseNodes : undefined)
+  return matches ? thenBranch : elseBranch
 }
 
 export const selectForBranch = (children: Node[], empty: boolean): Node[] => {
@@ -247,4 +268,6 @@ export const pdfBindingComponents: Record<string, JasyComponentFn> = {
   If,
   for: For,
   For,
+  include: Include,
+  Include,
 }

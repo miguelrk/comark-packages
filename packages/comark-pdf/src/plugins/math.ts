@@ -41,7 +41,7 @@ const loadTexToSvg = async (): Promise<TexToSvg | null> => {
     RegisterHTMLHandler(adaptor)
     const html = mathjax.document('', {
       InputJax: new TeX({ packages: AllPackages }),
-      OutputJax: new SVG({ fontCache: 'local' }),
+      OutputJax: new SVG({ fontCache: 'none' }),
     })
     texToSvg = (tex: string, display: boolean) =>
       adaptor.outerHTML(html.convert(tex, { display }))
@@ -58,8 +58,11 @@ const latexToSvg = async (tex: string, display: boolean): Promise<string | null>
   const convert = await loadTexToSvg()
   if (!convert) return null
   try {
-    const svg = convert(tex, display)
-    return svg.includes('<svg') ? svg : null
+    const html = convert(tex, display)
+    const start = html.indexOf('<svg')
+    const end = html.lastIndexOf('</svg>')
+    if (start < 0 || end < 0) return null
+    return html.slice(start, end + '</svg>'.length)
   }
   catch {
     return null
@@ -71,8 +74,13 @@ export const Math: JasyComponentFn = async ([, attrs]: ElementNode) => {
   const isInline = String(attrs.class ?? '').includes('inline')
   const svg = await latexToSvg(content, !isInline)
   if (svg) {
-    const drawn = Svg(sanitizeSvgLengths(svg), isInline ? { height: 11 } : {})
-    return isInline ? drawn : Box({ bg: '#f6f8fa', padding: 10, radius: 4 }, [drawn])
+    try {
+      const drawn = Svg(sanitizeSvgLengths(svg), { height: isInline ? 12 : 36 })
+      return isInline ? drawn : Box({ bg: '#f6f8fa', padding: 10, radius: 4 }, [drawn])
+    }
+    catch {
+      // jasy Svg rejects some MathJax markup. The source stays readable.
+    }
   }
   return isInline ? sourceText(content) : sourceBox(content)
 }
