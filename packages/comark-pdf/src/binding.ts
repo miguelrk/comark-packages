@@ -1,7 +1,7 @@
 import type { Node } from 'comark'
 import type { PDFElement } from '@jasy/pdf'
 import { Column, Text } from '@jasy/pdf'
-import type { JasyComponentFn, JasyMapContext } from './jasy.ts'
+import type { JasyComponentFn } from './jasy.ts'
 
 export type BindingScope = {
   data?: Record<string, unknown>

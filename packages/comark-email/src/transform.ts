@@ -214,7 +214,8 @@ export const nodeToColumnChildren = async (node: Node, options?: EmailRendererOp
   }
 
   // Raw HTML block
-  if (attrs?.$?.html === 1) {
+  const rawHtml = attrs.$ as { html?: unknown } | undefined
+  if (rawHtml?.html === 1) {
     const content = await renderNodeHtml(node, options)
     return [{ tagName: 'mj-raw', attributes: {}, content }]
   }
