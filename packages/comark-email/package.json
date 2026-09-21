@@ -1,6 +1,6 @@
 {
   "name": "comark-email",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Email renderer for Comark. Convert Markdown to responsive, MJML-compiled HTML for email clients.",
   "comark": {
     "headline": "Email renderer",
