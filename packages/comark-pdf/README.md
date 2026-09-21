@@ -148,24 +148,82 @@ const bytes = await renderPdf(markdown, {
 })
 ```
 
-## Feature support
+## Feature matrix
 
-**Supported:** headings, paragraphs, bold / italic / strikethrough, links, lists, blockquotes, rules, tables, SVG nodes, `::if` / `::for` / `::include` bindings, custom jasy components, page size and margins, headers / footers with `{{ page }}` / `{{ totalPages }}` tokens, `::page-break`, multi-page flow, browser `mount`, Node file export.
+Three layers, one job each:
 
-`visuals.image: 'embed'` passes a local file path or bytes to jasy `Image`. Default markdown images stay as alt-text.
+| Layer | Job |
+| --- | --- |
+| [Comark](https://comark.dev) | Parse markdown to an AST. |
+| `comark-pdf` | Read that AST. Choose policy. Call jasy primitives. |
+| [jasy](https://jasy.dev/docs/pdf) | Draw and lay out PDF primitives. It does not parse Markdown, Mermaid, KaTeX, or Shiki. See [jasy/llms.txt](https://jasy.dev/llms.txt). |
 
-**Degraded (source kept, no rich visual):**
+**Status:** `yes` mapped · `fallback` still a valid PDF · `workaround` host-side until jasy grows the primitive · `host` `renderPdf` option, not markdown · `no` not mapped · `jasy` use `@jasy/pdf` (or a custom component) directly.
 
-| Feature | PDF output | Reason |
-| ------- | ---------- | ------ |
-| Code blocks (Shiki / rangi) | Monospace text in a tinted box | Highlighters emit HTML token trees; we do not map tokens to colored `span`s |
-| Math (KaTeX) | LaTeX source as monospace text | KaTeX emits HTML; SVG / MathML is not wired |
-| Mermaid | Diagram source as a monospace block | Plugin does not pass Mermaid SVG into jasy `Svg()` yet |
-| Images (default) | Alt-text placeholder | HTTP(S) URL fetch is not wired. Inline `img` always stays alt-text |
+### Comark syntax → PDF
 
-**Not yet:** raw HTML blocks as layout, footnote chrome (raised markers + notes at the page foot), GFM task-list / checkbox glyphs.
+| Feature | Comark | comark-pdf | jasy |
+| --- | --- | --- | --- |
+| Frontmatter / `pdf:` | YAML | Merged into page config | `Page` / `Document` props |
+| Headings `h1`–`h6` | yes | `Text` + `Bookmark` + `Anchor` (outline) | [`Bookmark`, `Anchor`](https://jasy.dev/docs/pdf/navigation), `Text` |
+| Paragraph | yes | `Paragraph` | [`Paragraph` / `Text`](https://jasy.dev/docs/pdf/text) |
+| Bold / italic / strike | `**` `_` `~~` | `span` flags | `span({ bold, italic, strikethrough })` |
+| Inline code | `` ` `` | `span` Courier | `span({ font: 'Courier' })` |
+| `sup` / `sub` | HTML | `span({ verticalAlign })` | `span({ verticalAlign: 'super' \| 'sub' })` |
+| Link | `[text](url)` | `span({ href })` | `span({ href })` / `Link` |
+| Unordered / ordered list | yes | `Row` marker + `Column` | `Row`, `Column`, `Text` |
+| Nested list | yes | Recursive list map | same primitives |
+| GFM task list | `- [x]` / `- [ ]` | Printed `[x]` / `[ ]` (Courier). Drops `input`. Does not create AcroForm. | `Text`. `Checkbox` is a form field — not used here. |
+| Blockquote | `>` | Tinted `Box` (+ bar when `visuals.quote`) | `Box` |
+| Horizontal rule | `---` | `Divider` | `Divider` |
+| GFM table | yes | `Table` | `Table` |
+| Key-value table | 2-col empty header | `visuals.table.keyValue` → `auto` / `2fr` | `Table({ columns })` |
+| Fenced code | yes | Monospace `Box`. Token `color:` → `span` when rangi / Shiki rewrote `pre` | Colored `span` in `Text` |
+| Image (default) | `![alt](src)` | Alt-text | — |
+| Image embed | same | `visuals.image: 'embed'`: data URI, path, or HTTP fetch (15 s / 8 MB). Fail → alt-text. | [`Image(path \| bytes)`](https://jasy.dev/docs/pdf/images). No `Image(url)` yet. |
+| Inline image + embed | `![alt](src)` in a `p` | Workaround: `Column` of text + `Image` + text | Needs an inline-replaced image for in-sentence layout |
+| SVG node | HTML `<svg>` | `Svg(sanitizeSvgLengths(…))` | `Svg` |
+| `::page-break` | component | `PageBreak()` or `Box({ breakBefore })` | [`PageBreak`, `breakBefore`](https://jasy.dev/docs/pdf/pages) |
+| Multi-page flow | long AST | One `Page`; jasy paginates | Automatic pagination |
+| Header / footer strings | `pdf.header` / `footer` | Compiled chrome; `{{ page }}` / `{{ totalPages }}` | `Page.header` / `footer`, `PageNumber`, `PageCount` |
+| `{{ }}` / `:bind` | binding plugin | Interpolates `data` / `frontmatter` / `props` | — (host data) |
+| `::if` / `::for` / `::include` | binding plugin | Built-in jasy components | — |
+| Custom `::tag` | Comark component | `components.tag` → `JasyComponentFn` | Any jasy element |
+| Math `$…$` / `$$…$$` | math plugin | Optional `mathjax-full` → `Svg`. Else Courier source. | `Svg` |
+| Mermaid fence | mermaid plugin | Optional `mermaid` (+ DOM / `happy-dom`) → `Svg`. Else source box. | `Svg` |
+| Raw HTML as layout | HTML blocks | **no** — flattened / ignored. jasy is not a CSS engine. | **no** — do not ask for `Html()` |
+| Page-foot footnotes | not a first-class map | **no** — needs a jasy page-foot / endnote region | Header/footer chrome is the wrong tool |
 
-Most of those gaps are mapper work in this package. jasy already has `Svg`, colored `span`s, `verticalAlign` on spans, `Checkbox`, and `Image` from a path or bytes. What we still miss on the jasy side is mainly HTTP(S) image load (fonts already have `addFontFromUrl`) and a first-class footnote / endnote region.
+### Host options (not markdown)
+
+| Feature | comark-pdf | jasy |
+| --- | --- | --- |
+| Page size / orientation / margin / gap | `pdf.format`, `width`+`height`, `orientation`, `margin`, `gap` | `Page({ size, orientation, margin, gap })` |
+| Document type defaults | `pdf.font`, `fontSize`, `color`, `lineHeight`, `textAlign` | `Document({ font, size, … })` |
+| Metadata / a11y / overflow | `pdf.title`, `author`, `lang`, `accessible`, `onOverflow` | `renderToBytes` options |
+| Encryption | `pdf.encrypt` | AES-256 encrypt options |
+| Embedded fonts | `fonts` + `addFont` | `addFont` / `addFontFromUrl` |
+| Print faces / ink / table / quote | `visuals` | Host maps faces onto `Text` / `Box` / `Table` |
+| Chrome elements | `chrome.header` / `footer` / `watermark` | `Page` header/footer, `Positioned` overlay |
+| Missing glyphs | `onMissingGlyphs` | `renderToBytes({ onMissingGlyphs })` |
+| Node file export | `comark-pdf/node` | `renderToBytes` + `writeFile` |
+| Browser preview | `comark-pdf/preview` `mount` | bytes → Blob URL |
+
+### jasy-only (custom component or call jasy)
+
+These exist in [jasy](https://jasy.dev/docs/pdf) and are not markdown features. Expose them with `components` when a host needs them.
+
+| jasy | Why it stays in jasy |
+| --- | --- |
+| AcroForm fields (`TextField`, `Checkbox`, `RadioGroup`, `Dropdown`, `ListBox`, `PushButton`, `SignatureField`) | Fillable widgets. Task lists stay printed marks. |
+| `fillForm` / `flattenForm` | Edit an existing form PDF |
+| `Link` around a box / image | Markdown links are text `span({ href })` |
+| `Canvas` | Drawing API, not an AST node |
+| `keepTogether`, orphans / widows, `PageBuilder` | Layout policy on the jasy tree |
+| `hyphenate`, `direction: 'rtl'`, ligatures / kerning flags | Text engine options; no markdown syntax |
+| `@jasy/zugferd` | E-invoice XML + PDF/A-3 — separate package |
+
+A native jasy `Image(url)` (parity with `addFontFromUrl`) would replace the HTTP fetch workaround. A footnote / endnote page region would enable page-foot notes. They are useful, not blockers.
 
 ## Plugins
 

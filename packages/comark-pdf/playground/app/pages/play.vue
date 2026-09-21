@@ -19,6 +19,8 @@ const createRenderer = (example: DemoExample) =>
   createPdfRenderer({
     plugins: example.plugins,
     components: example.components,
+    visuals: example.visuals,
+    data: example.data,
   })
 
 let renderPdf = createRenderer(active.value)

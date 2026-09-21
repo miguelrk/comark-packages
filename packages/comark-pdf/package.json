@@ -71,12 +71,19 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "comark": ">=0.7.0"
+    "comark": ">=0.7.0",
+    "mathjax-full": ">=3.2.0",
+    "mermaid": ">=10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mathjax-full": { "optional": true },
+    "mermaid": { "optional": true }
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "comark": "catalog:",
     "happy-dom": "^20.14.5",
+    "rangi": "catalog:",
     "release-it": "catalog:",
     "tsdown": "catalog:",
     "tsx": "catalog:",

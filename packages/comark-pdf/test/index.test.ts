@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
+import rangi from 'comark/plugins/rangi'
 import { createPdfRenderer, renderPdf, renderPdfFromDocument, Include } from '../src/index.ts'
 import { interpolateBindings, resolveBindingText } from '../src/binding.ts'
 import math, { Math as MathComponent } from '../src/plugins/math.ts'
+import mermaid, { Mermaid } from '../src/plugins/mermaid.ts'
 import { PageBreak } from '../src/plugins/page-break.ts'
 import { BASIC_MARKDOWN, ADVANCED_MARKDOWN } from './fixtures/markdown.ts'
 
@@ -78,6 +80,31 @@ describe('renderPdf', () => {
       plugins: [math()],
       components: { Math: MathComponent },
     })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('renders mermaid as SVG or source fallback', async () => {
+    const bytes = await renderPdf(ADVANCED_MARKDOWN, {
+      plugins: [mermaid()],
+      components: { Mermaid },
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('renders rangi-highlighted code', async () => {
+    const bytes = await renderPdf('```js\nconst x = 1\n```\n', {
+      plugins: [rangi()],
+    })
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('renders GFM task lists', async () => {
+    const bytes = await renderPdf('- [x] Done\n- [ ] Todo\n')
+    expect(isPdf(bytes)).toBe(true)
+  })
+
+  it('renders superscript HTML', async () => {
+    const bytes = await renderPdf('E = mc<sup>2</sup>')
     expect(isPdf(bytes)).toBe(true)
   })
 })

@@ -3,6 +3,8 @@ import type { ElementNode, MarkdownDocument, Node } from 'comark'
 import type { BindingScope } from './binding.ts'
 import type { PdfFace, PdfVisuals } from './types.ts'
 import {
+  Anchor,
+  Bookmark,
   Box,
   Column,
   Divider,
@@ -17,6 +19,7 @@ import {
   Text,
 } from '@jasy/pdf'
 import { resolveBindingText, resolveBoundAttrs } from './binding.ts'
+import { resolveImageSrc } from './image.ts'
 
 export type JasyComponentResult = PDFElement | PDFElement[] | null
 
@@ -115,7 +118,7 @@ const nodeToHtml = (node: Node): string => {
   return `<${tag}${space}>${inner}</${tag}>`
 }
 
-const sanitizeSvgLengths = (svg: string): string => {
+export const sanitizeSvgLengths = (svg: string): string => {
   const vb = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/)
   const w = vb?.[1] ?? '100'
   const h = vb?.[2] ?? '100'
@@ -158,6 +161,128 @@ const textContent = (nodes: Node[]): string =>
     })
     .join('')
 
+const classOf = (attrs: Record<string, unknown>): string =>
+  String(attrs.class ?? '')
+
+const isTruthyBinding = (value: unknown): boolean =>
+  value === true || value === 'true' || value === ''
+
+const isCheckboxInput = (tag: unknown, attrs: Record<string, unknown>): boolean =>
+  tag === 'input' && String(attrs.type ?? '') === 'checkbox'
+
+const findCheckbox = (nodes: Node[]): { checked: boolean } | null => {
+  for (const node of nodes) {
+    if (typeof node === 'string') continue
+    const [tag, attrs, ...children] = node as ElementNode
+    if (isCheckboxInput(tag, attrs)) {
+      return { checked: isTruthyBinding(attrs[':checked'] ?? attrs.checked) }
+    }
+    if (tag === 'p' || tag === 'label' || tag === 'li') {
+      const inner = findCheckbox(children as Node[])
+      if (inner) return inner
+    }
+  }
+  return null
+}
+
+const stripCheckbox = (nodes: Node[]): Node[] => {
+  const out: Node[] = []
+  for (const node of nodes) {
+    if (typeof node === 'string') {
+      out.push(node)
+      continue
+    }
+    const [tag, attrs, ...children] = node as ElementNode
+    if (isCheckboxInput(tag, attrs)) continue
+    if (tag === 'p' || tag === 'label') {
+      out.push([tag, attrs, ...stripCheckbox(children as Node[])] as ElementNode)
+      continue
+    }
+    out.push(node)
+  }
+  return out
+}
+
+const hasEmbeddableImg = (nodes: Node[], ctx: JasyMapContext): boolean => {
+  if (ctx.visuals?.image !== 'embed') return false
+  return nodes.some((node) => {
+    if (typeof node === 'string') return false
+    const [tag, attrs, ...children] = node as ElementNode
+    if (tag === 'img' && String(attrs.src ?? '').trim()) return true
+    return hasEmbeddableImg(children as Node[], ctx)
+  })
+}
+
+const cssDecl = (style: unknown, property: string): string | undefined => {
+  if (typeof style !== 'string') return undefined
+  const match = new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*([^;]+)`, 'i').exec(style)
+  const value = match?.[1]?.trim()
+  return value || undefined
+}
+
+const mapCodeSpans = (
+  nodes: Node[],
+  inherit: Record<string, unknown> = {},
+): ReturnType<typeof span>[] => {
+  const result: ReturnType<typeof span>[] = []
+  for (const node of nodes) {
+    if (typeof node === 'string') {
+      if (node) result.push(span(node, inherit))
+      continue
+    }
+    const [tag, attrs, ...children] = node as ElementNode
+    const color = cssDecl(attrs.style, 'color')
+    const next = color && !color.includes('--shiki-dark') ? { ...inherit, color } : inherit
+    if (tag === 'code' || tag === 'span') {
+      result.push(...mapCodeSpans(children as Node[], next))
+      continue
+    }
+    result.push(...mapCodeSpans(children as Node[], inherit))
+  }
+  return result
+}
+
+const slugHeading = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    || 'heading'
+
+const altImageText = (alt: string) =>
+  Text(alt ? `[Image: ${alt}]` : '[Image]', { italic: true, color: '#666666', size: 11 }) as PDFElement
+
+const embedImage = async (
+  attrs: Record<string, unknown>,
+  ctx: JasyMapContext,
+): Promise<PDFElement | null> => {
+  const alt = String(attrs.alt ?? '')
+  if (ctx.visuals?.image !== 'embed') return altImageText(alt)
+  const src = String(attrs.src ?? '')
+  if (!src) return altImageText(alt)
+  const resolved = await resolveImageSrc(src)
+  if (resolved.kind === 'fallback') return altImageText(alt)
+  const w = attrs.width ? Number(attrs.width) : undefined
+  const h = attrs.height ? Number(attrs.height) : undefined
+  return Image(resolved.kind === 'bytes' ? resolved.bytes : resolved.path, {
+    ...(w ? { width: w } : {}),
+    ...(h ? { height: h } : {}),
+    ...(alt ? { alt } : {}),
+  }) as PDFElement
+}
+
+const wrapHeading = (
+  heading: PDFElement,
+  tag: string,
+  attrs: Record<string, unknown>,
+  children: Node[],
+): PDFElement => {
+  const title = textContent(children).trim() || tag
+  const level = Number.parseInt(String(tag).charAt(1), 10) || 1
+  const name = String(attrs.id ?? `h${level}-${slugHeading(title)}`)
+  return Bookmark({ title, level }, Anchor({ name }, heading)) as PDFElement
+}
+
 const mapInlineToSpans = (
   nodes: Node[],
   inheritStyle: Record<string, unknown> = {},
@@ -197,11 +322,22 @@ const mapInlineToSpans = (
       case 'del':
         style.strikethrough = true
         break
+      case 'sup':
+        style.verticalAlign = 'super'
+        style.size = typeof inheritStyle.size === 'number' ? inheritStyle.size * 0.75 : 9
+        break
+      case 'sub':
+        style.verticalAlign = 'sub'
+        style.size = typeof inheritStyle.size === 'number' ? inheritStyle.size * 0.75 : 9
+        break
       case 'img': {
+        if (ctx.visuals?.image === 'embed') continue
         const alt = String(attrs.alt ?? '')
         if (alt) result.push(span(`[${alt}]`, { ...inheritStyle, italic: true, color: '#666666' }))
         continue
       }
+      case 'input':
+        continue
       default: {
         if (tag === 'binding') {
           const text = resolveBindingText(rawAttrs, ctx)
@@ -229,7 +365,8 @@ const inlineContent = (
   children: Node[],
   ctx: JasyMapContext,
 ): string | ReturnType<typeof span>[] => {
-  const spans = mapInlineToSpans(children, {}, ctx)
+  const size = ctx.visuals ? resolveFace(ctx, 'body').size : ctx.textDefaults?.size ?? DEFAULT_BODY_SIZE
+  const spans = mapInlineToSpans(children, { size }, ctx)
   if (spans.length === 0) return ''
   if (spans.length === 1 && Object.keys(spans[0] as object).length <= 1) {
     return (spans[0] as { text?: string }).text ?? ''
@@ -245,6 +382,9 @@ const mapListItem = async (
     const child = children[0]
     if (Array.isArray(child) && (child as ElementNode)[0] === 'p') {
       const [, , ...pChildren] = child as ElementNode
+      if (hasEmbeddableImg(pChildren, ctx) || cellHasComponent(pChildren, ctx)) {
+        return ctx.mapNodes(unwrapCellNodes(pChildren))
+      }
       const content = inlineContent(pChildren, ctx)
       return [Text(content, bodyTextStyle(ctx)) as PDFElement]
     }
@@ -300,7 +440,7 @@ const mapTableCell = async (
     return wrapTableCell(Text('', style()) as PDFElement, pad, headerBg)
   }
   const align = String(attrs.align ?? 'left') as 'left' | 'center' | 'right'
-  if (cellHasComponent(children as Node[], ctx)) {
+  if (cellHasComponent(children as Node[], ctx) || hasEmbeddableImg(children as Node[], ctx)) {
     const mapped = await ctx.mapNodes(unwrapCellNodes(children as Node[]))
     const inner = mapped.length === 0
       ? Text('', style({ align })) as PDFElement
@@ -375,19 +515,20 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
               }),
             ]) as PDFElement
           : heading
-        return applyPad(face, ctx.visuals.space, withRule)
+        return wrapHeading(applyPad(face, ctx.visuals.space, withRule), String(tag), attrs, children)
       }
       const level = parseInt(String(tag).charAt(1)) - 1
-      return Text(content as string, {
+      const heading = Text(content as string, {
         size: HEADING_SIZES[level] ?? 12,
         bold: level < 2,
         ...(ctx.textDefaults?.font !== undefined ? { font: ctx.textDefaults.font } : {}),
         ...(ctx.textDefaults?.color !== undefined ? { color: ctx.textDefaults.color } : {}),
       }) as PDFElement
+      return wrapHeading(heading, String(tag), attrs, children)
     }
 
     case 'p': {
-      if (cellHasComponent(children, ctx)) {
+      if (cellHasComponent(children, ctx) || hasEmbeddableImg(children, ctx)) {
         const mapped = await ctx.mapNodes(unwrapCellNodes(children))
         if (mapped.length === 0) return null
         return (mapped.length === 1 ? mapped[0] : Column({ gap: 2 }, mapped)) as PDFElement
@@ -416,9 +557,11 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
     }
 
     case 'pre': {
-      const code = textContent(children).trimEnd()
+      const bg = cssDecl(attrs.style, 'background-color') ?? cssDecl(attrs.style, 'background') ?? '#f6f8fa'
+      const runs = mapCodeSpans(children, { font: 'Courier', size: 10 })
+      const code = runs.length > 0 ? runs : textContent(children).trimEnd()
       return Box(
-        { bg: '#f6f8fa', padding: 12, radius: 4 },
+        { bg, padding: 12, radius: 4 },
         [Text(code, { font: 'Courier', size: 10 }) as PDFElement],
       ) as PDFElement
     }
@@ -429,29 +572,22 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
         margin: { y: ctx.visuals?.space?.tight ?? 8 },
       }) as PDFElement
 
-    case 'ul': {
-      const items = await Promise.all(children.map(async (child) => {
-        if (typeof child === 'string') return null
-        const [itemTag, , ...itemChildren] = child as ElementNode
-        if (itemTag !== 'li') return null
-        const inner = await mapListItem(itemChildren, ctx)
-        return Row({ gap: 6, align: 'start' }, [
-          Text('•', bodyTextStyle(ctx, { color: '#666666' })) as PDFElement,
-          Column({ gap: 4 }, inner.length > 0 ? inner : [Text('') as PDFElement]) as PDFElement,
-        ]) as PDFElement
-      }))
-      const filteredItems = items.filter((x): x is PDFElement => x !== null)
-      return Column({ gap: 6 }, filteredItems.length > 0 ? filteredItems : [Text('') as PDFElement]) as PDFElement
-    }
-
+    case 'ul':
     case 'ol': {
       const items = await Promise.all(children.map(async (child, i) => {
         if (typeof child === 'string') return null
-        const [itemTag, , ...itemChildren] = child as ElementNode
+        const [itemTag, itemAttrs, ...itemChildren] = child as ElementNode
         if (itemTag !== 'li') return null
-        const inner = await mapListItem(itemChildren, ctx)
+        const checkbox = classOf(itemAttrs).includes('task-list-item')
+          ? findCheckbox(itemChildren) ?? { checked: false }
+          : findCheckbox(itemChildren)
+        const body = checkbox ? stripCheckbox(itemChildren) : itemChildren
+        const inner = await mapListItem(body, ctx)
+        const marker = checkbox
+          ? Text(checkbox.checked ? '[x]' : '[ ]', bodyTextStyle(ctx, { font: 'Courier', color: '#666666' }))
+          : Text(tag === 'ol' ? `${i + 1}.` : '•', bodyTextStyle(ctx, { color: '#666666' }))
         return Row({ gap: 6, align: 'start' }, [
-          Text(`${i + 1}.`, bodyTextStyle(ctx, { color: '#666666' })) as PDFElement,
+          marker as PDFElement,
           Column({ gap: 4 }, inner.length > 0 ? inner : [Text('') as PDFElement]) as PDFElement,
         ]) as PDFElement
       }))
@@ -530,20 +666,11 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
       return Svg(sanitizeSvgLengths(`<svg${space}>${inner}</svg>`)) as PDFElement
     }
 
-    case 'img': {
-      if (ctx.visuals?.image === 'embed') {
-        const src = String(attrs.src ?? '')
-        if (!src) return null
-        const w = attrs.width ? Number(attrs.width) : undefined
-        const h = attrs.height ? Number(attrs.height) : undefined
-        return Image(src, {
-          ...(w ? { width: w } : {}),
-          ...(h ? { height: h } : {}),
-        }) as PDFElement
-      }
-      const alt = String(attrs.alt ?? '')
-      return Text(alt ? `[Image: ${alt}]` : '[Image]', { italic: true, color: '#666666', size: 11 }) as PDFElement
-    }
+    case 'img':
+      return embedImage(attrs, ctx)
+
+    case 'input':
+      return null
 
     case 'a': {
       const inner = await ctx.mapNodes(children)

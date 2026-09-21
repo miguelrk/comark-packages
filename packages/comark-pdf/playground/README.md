@@ -5,6 +5,12 @@ Nuxt site for `comark-pdf`.
 - `/` — repository README, rendered with Comark
 - `/play` — editable Markdown playground
 
+`/play` has three examples:
+
+- **Markdown** — full mapper tour (text, lists, task marks, tables, rangi, math, mermaid, embed images, SVG, bindings, custom `::alert`, page chrome)
+- **Invoice** — multi-page table + key-value blocks
+- **Product label** — custom page size + `::barcode` component
+
 ## Running
 
 From the repository root:
