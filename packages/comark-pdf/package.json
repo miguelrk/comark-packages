@@ -1,6 +1,6 @@
 {
   "name": "comark-pdf",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "PDF renderer for Comark. Convert Markdown to print-ready PDF bytes via jasy — no headless browser required.",
   "comark": {
     "headline": "PDF renderer",
