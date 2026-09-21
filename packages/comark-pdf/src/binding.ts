@@ -14,6 +14,11 @@ const NAMESPACES = new Set(['data', 'frontmatter', 'props', 'meta'])
 
 const BINDING_IN_STRING = /\{\{\s*([^}|]+?)\s*(?:\|\|\s*([^}]+?)\s*)?\}\}/g
 
+const isPresent = (value: unknown): boolean => value != null && value !== ''
+
+const formatResolved = (value: unknown): string =>
+  typeof value === 'object' ? JSON.stringify(value) : String(value)
+
 const IF_COMPARISON_OPERATORS = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte'] as const
 
 type IfComparisonOperator = (typeof IF_COMPARISON_OPERATORS)[number]
@@ -40,20 +45,11 @@ export const resolvePath = (path: string, scope: BindingScope): unknown => {
   return undefined
 }
 
-const resolveFallback = (fallback: string | undefined, scope: BindingScope): string => {
-  if (fallback == null) return ''
-  const alt = fallback.trim()
-  if (!alt) return ''
-  const fromPath = resolvePath(alt, scope)
-  if (fromPath != null && fromPath !== '') return String(fromPath)
-  return alt
-}
-
 export const interpolateBindings = (value: string, scope: BindingScope): string =>
   value.replace(BINDING_IN_STRING, (_match, path: string, fallback?: string) => {
     const resolved = resolvePath(path.trim(), scope)
-    if (resolved != null && resolved !== '') return String(resolved)
-    return resolveFallback(fallback, scope)
+    if (isPresent(resolved)) return formatResolved(resolved)
+    return fallback?.trim() ?? ''
   })
 
 export const resolveBoundAttrs = (
@@ -75,17 +71,12 @@ export const resolveBoundAttrs = (
   return out
 }
 
-const bindingText = (attrs: Record<string, unknown>, scope: BindingScope): string => {
-  const path = attrs[':value']
-  const resolved = typeof path === 'string' ? resolvePath(path, scope) : attrs.value
-  if (resolved == null || resolved === '') {
-    return attrs.defaultValue != null ? String(attrs.defaultValue) : ''
-  }
-  return typeof resolved === 'object' ? JSON.stringify(resolved) : String(resolved)
+export const resolveBindingText = (attrs: Record<string, unknown>, scope: BindingScope): string => {
+  const path = typeof attrs[':value'] === 'string' ? attrs[':value'] : undefined
+  const resolved = path != null ? resolvePath(path, scope) : attrs.value
+  if (isPresent(resolved)) return formatResolved(resolved)
+  return isPresent(attrs.defaultValue) ? String(attrs.defaultValue) : ''
 }
-
-export const resolveBindingText = (attrs: Record<string, unknown>, scope: BindingScope): string =>
-  bindingText(attrs, scope)
 
 type IfProps = {
   value?: unknown
@@ -210,7 +201,7 @@ export const resolveForIterations = (
 }
 
 export const Binding: JasyComponentFn = (element, ctx) => {
-  const text = bindingText(element[1], ctx)
+  const text = resolveBindingText(element[1], ctx)
   return text ? Text(text) : null
 }
 

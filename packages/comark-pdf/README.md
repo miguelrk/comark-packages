@@ -79,7 +79,7 @@ handle.revoke()
 
 ## Locale files
 
-The library does not own template files. Hosts pick one markdown file per locale (`en/`, `es/`). Bind `.en` or `.es` on typed objects. Use `||` for an empty fallback: `{{ data.sheet.tradeName.en || data.sheet.tradeName.es }}`. The right side is a second path first, then a literal.
+The library does not own template files. Hosts pick one markdown file per locale (`en/`, `es/`). Bind only the locale key that the file owns: `{{ data.sheet.tradeName.en }}` in the English file, `{{ data.sheet.tradeName.es }}` in the Spanish file. Do not write `||` locale fallbacks. A missing value renders empty.
 
 Do not use `::kv`. Write labels in the locale file (GFM tables, `::if`, `::for`). Use `::include` only for a stored markdown string. Do not use `[meta.locale]`.
 

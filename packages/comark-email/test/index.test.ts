@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
 import { createEmailRenderer, renderEmail, renderEmailFromDocument } from '../src/index.ts'
-import { interpolateBindings } from '../src/binding.ts'
+import { interpolateBindings, resolveBindingText } from '../src/binding.ts'
 import { BASIC_EMAIL_MARKDOWN, ADVANCED_EMAIL_MARKDOWN } from './fixtures/markdown.ts'
 
 describe('renderEmail', () => {
@@ -168,9 +168,12 @@ describe('binding', () => {
     expect(html).toContain('Two')
   })
 
-  it('resolves || as a second path, then as a literal', () => {
+  it('uses || as a literal default', () => {
     const scope = { data: { tradeName: { es: 'Graficoat', en: '' } } }
-    expect(interpolateBindings('{{ data.tradeName.en || data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.tradeName.en }}', scope)).toBe('')
     expect(interpolateBindings('{{ data.missing || N/A }}', scope)).toBe('N/A')
+    expect(resolveBindingText({ ':value': 'data.missing', defaultValue: 'N/A' }, scope)).toBe('N/A')
+    expect(resolveBindingText({ ':value': 'data.tradeName.en' }, scope)).toBe('')
   })
 })

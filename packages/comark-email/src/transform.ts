@@ -3,8 +3,8 @@ import { renderHtmlFromDocument } from '@comark/html/render'
 import type { EmailConfig, EmailRendererOptions, MjmlNode } from './types.ts'
 import {
   resolveBoundAttrs,
+  resolveBindingText,
   resolveForIterations,
-  resolvePath,
   selectForBranch,
   selectIfBranch,
   shouldRenderIf,
@@ -49,10 +49,8 @@ const htmlOptions = (options?: EmailRendererOptions): EmailRendererOptions => ({
   components: {
     Binding: (node) => {
       const attrs = (node[1] || {}) as Record<string, unknown>
-      const path = attrs[':value']
-      const resolved = typeof path === 'string' ? resolvePath(path, scopeOf(options)) : attrs.value
-      const out = resolved ?? attrs.defaultValue
-      return out == null ? '' : escapeHtml(String(out))
+      const out = resolveBindingText(attrs, scopeOf(options))
+      return out ? escapeHtml(out) : ''
     },
     ...options?.components,
   },

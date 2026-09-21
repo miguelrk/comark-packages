@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseMarkdown } from 'comark'
 import { createPdfRenderer, renderPdf, renderPdfFromDocument, Include } from '../src/index.ts'
-import { interpolateBindings } from '../src/binding.ts'
+import { interpolateBindings, resolveBindingText } from '../src/binding.ts'
 import math, { Math as MathComponent } from '../src/plugins/math.ts'
 import { PageBreak } from '../src/plugins/page-break.ts'
 import { BASIC_MARKDOWN, ADVANCED_MARKDOWN } from './fixtures/markdown.ts'
@@ -214,9 +214,12 @@ describe('binding', () => {
     expect(isPdf(bytes)).toBe(true)
   })
 
-  it('resolves || as a second path, then as a literal', () => {
+  it('uses || as a literal default', () => {
     const scope = { data: { tradeName: { es: 'Graficoat', en: '' } } }
-    expect(interpolateBindings('{{ data.tradeName.en || data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.tradeName.es }}', scope)).toBe('Graficoat')
+    expect(interpolateBindings('{{ data.tradeName.en }}', scope)).toBe('')
     expect(interpolateBindings('{{ data.missing || N/A }}', scope)).toBe('N/A')
+    expect(resolveBindingText({ ':value': 'data.missing', defaultValue: 'N/A' }, scope)).toBe('N/A')
+    expect(resolveBindingText({ ':value': 'data.tradeName.en' }, scope)).toBe('')
   })
 })

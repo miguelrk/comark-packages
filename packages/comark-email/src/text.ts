@@ -2,6 +2,7 @@ import type { ElementNode, MarkdownDocument, Node } from 'comark'
 import type { BindingScope } from './binding.ts'
 import {
   resolveBoundAttrs,
+  resolveBindingText,
   resolveForIterations,
   selectForBranch,
   selectIfBranch,
@@ -52,8 +53,7 @@ const nodeToText = (node: Node, scope: BindingScope): string => {
   const children = childrenOf(element)
 
   if (tag === 'binding') {
-    const resolved = attrs.value ?? attrs.defaultValue
-    return resolved == null ? '' : String(resolved)
+    return resolveBindingText((element[1] ?? {}) as Record<string, unknown>, scope)
   }
 
   if (tag === 'if') {
