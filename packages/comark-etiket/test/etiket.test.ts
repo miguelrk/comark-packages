@@ -232,6 +232,16 @@ etiket:
   // Error tolerance — malformed/missing peer
   // ---------------------------------------------------------------------------
 
+  it('leaves a bound :value qrcode in place and does not warn', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { nodes } = await parseMarkdown('::qrcode{:value="data.restoreQrValue" ec-level="M" width="140"}', {
+      plugins: [etiket()],
+    })
+    expect(nodes.some((n) => Array.isArray(n) && n[0] === 'qrcode')).toBe(true)
+    expect(warnSpy).not.toHaveBeenCalled()
+    warnSpy.mockRestore()
+  })
+
   it('leaves directives unchanged when plugin is not used', async () => {
     const { nodes } = await parseMarkdown('::qrcode{value="https://example.com"}')
     // Without the plugin, the node stays as the directive tag

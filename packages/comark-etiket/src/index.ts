@@ -366,6 +366,8 @@ const generate = (
 
   const value = getDirectiveValue(attrs, children)
   if (value === undefined) {
+    // Bound `:value` resolves after parse. Leave the directive for the host.
+    if (typeof attrs[':value'] === 'string' && attrs[':value'].length > 0) return undefined
     console.warn(`[comark-etiket] ${tag} requires a value via value= attr or inline content`)
     return undefined
   }

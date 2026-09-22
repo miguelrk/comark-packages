@@ -198,6 +198,14 @@ const isHeadingNode = (node: Node): boolean => {
   return /^h[1-6]$/.test(String((node as ElementNode)[0] ?? ''))
 }
 
+/** Short prose blocks that should stay on the same page as the heading above them. */
+const KEEPS_WITH_HEADING = new Set(['p', 'blockquote', 'ul', 'ol'])
+
+const keepsWithHeading = (node: Node): boolean => {
+  if (typeof node === 'string' || !Array.isArray(node)) return false
+  return KEEPS_WITH_HEADING.has(String((node as ElementNode)[0] ?? ''))
+}
+
 const textContent = (nodes: Node[]): string =>
   nodes
     .map((n) => {
@@ -701,8 +709,8 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
         const rows = await Promise.all(bodyRowNodes.map(async (rowNode) => {
           const cells = childrenOf(rowNode).filter(c => Array.isArray(c) || typeof c === 'string')
           const cell = async (node: Node | string | undefined) => {
-          const plain = cellPlainText(node, ctx).trim()
-          const mapped = await mapTableCell((plain || cellHasElement(node)) ? (node ?? '') : '—', ctx, 'body')
+            const plain = cellPlainText(node, ctx).trim()
+            const mapped = await mapTableCell((plain || cellHasElement(node)) ? (node ?? '') : '—', ctx, 'body')
             return hairline
               ? Box({ borderBottom: hairline, width: '100%' }, [mapped])
               : mapped
@@ -726,7 +734,7 @@ const mapBlockNode = async (node: Node, ctx: JasyMapContext): Promise<PDFElement
           columns,
           header: headerCells,
           cellPadding: paddedInCells ? 0 : cellPad,
-          rule: ctx.visuals?.table?.rule ?? ctx.visuals?.ink?.rule ?? '#cccccc',
+          cellBorder: ctx.visuals?.ink?.hairline ?? ctx.visuals?.table?.rule ?? '#cccccc',
         },
         rows,
       ) as PDFElement
@@ -820,6 +828,7 @@ const mapNodes = async (nodes: Node[], ctx: JasyMapContext): Promise<PDFElement[
     if (
       isHeadingNode(node)
       && next
+      && keepsWithHeading(next)
       && !isInlineNode(next, ctx)
       && !isReplacedInline(next, ctx)
       && !isHeadingNode(next)
