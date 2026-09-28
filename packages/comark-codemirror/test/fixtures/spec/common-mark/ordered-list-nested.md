@@ -1,0 +1,91 @@
+## Input
+
+```md
+1. First item
+2. Second item
+3. Third item
+   1. Indented item
+   2. Indented item
+4. Fourth item
+```
+
+## AST
+
+```json
+{
+  "frontmatter": {},
+  "meta": {},
+  "nodes": [
+    [
+      "ol",
+      {},
+      [
+        "li",
+        {},
+        "First item"
+      ],
+      [
+        "li",
+        {},
+        "Second item"
+      ],
+      [
+        "li",
+        {},
+        [
+          "p",
+          {},
+          "Third item"
+        ],
+        [
+          "ol",
+          {},
+          [
+            "li",
+            {},
+            "Indented item"
+          ],
+          [
+            "li",
+            {},
+            "Indented item"
+          ]
+        ]
+      ],
+      [
+        "li",
+        {},
+        "Fourth item"
+      ]
+    ]
+  ]
+}
+```
+
+## HTML
+
+```html
+<ol>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>
+    <p>Third item</p>
+    <ol>
+      <li>Indented item</li>
+      <li>Indented item</li>
+    </ol>
+  </li>
+  <li>Fourth item</li>
+</ol>
+```
+
+## Markdown
+
+```md
+1. First item
+2. Second item
+3. Third item
+   1. Indented item
+   2. Indented item
+4. Fourth item
+```

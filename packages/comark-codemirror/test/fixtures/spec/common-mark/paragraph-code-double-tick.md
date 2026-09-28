@@ -1,0 +1,37 @@
+## Input
+
+```md
+``Use `code` in your Markdown file.``
+```
+
+## AST
+
+```json
+{
+  "frontmatter": {},
+  "meta": {},
+  "nodes": [
+    [
+      "p",
+      {},
+      [
+        "code",
+        {},
+        "Use `code` in your Markdown file."
+      ]
+    ]
+  ]
+}
+```
+
+## HTML
+
+```html
+<p><code>Use `code` in your Markdown file.</code></p>
+```
+
+## Markdown
+
+```md
+``Use `code` in your Markdown file.``
+```

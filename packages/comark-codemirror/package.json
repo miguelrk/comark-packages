@@ -1,0 +1,155 @@
+{
+  "name": "comark-codemirror",
+  "version": "0.1.0",
+  "description": "A Comark code editor for CodeMirror 6 where you can autocomplete everything: components, props, values, slots, bindings and all plugin syntax, in chained menus.",
+  "comark": {
+    "headline": "Editor",
+    "tagline": "Autocomplete everything in Comark.",
+    "install": "npm i comark-codemirror codemirror"
+  },
+  "keywords": [
+    "comark",
+    "markdown",
+    "mdc",
+    "editor",
+    "code-editor",
+    "codemirror",
+    "autocomplete",
+    "lezer"
+  ],
+  "homepage": "https://miguelrk.github.io/comark-packages/comark-codemirror/",
+  "bugs": {
+    "url": "https://github.com/miguelrk/comark-packages/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miguelrk/comark-packages.git",
+    "directory": "packages/comark-codemirror"
+  },
+  "author": "Miguel Romero Karam",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./agent": {
+      "types": "./dist/agent.d.mts",
+      "default": "./dist/agent.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "default": "./dist/vite.mjs"
+    },
+    "./plugins/*": {
+      "types": "./dist/plugins/*.d.mts",
+      "default": "./dist/plugins/*.mjs"
+    },
+    "./presets/*": {
+      "types": "./dist/presets/*.d.mts",
+      "default": "./dist/presets/*.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "docs": "pnpm --filter comark-codemirror-docs dev",
+    "docs:generate": "pnpm --filter comark-codemirror-docs generate",
+    "gen:docs": "tsx scripts/gen-docs.ts",
+    "sync:spec": "tsx scripts/sync-spec.ts",
+    "prepack": "npm run build",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:node": "vitest run --project node",
+    "test:browser": "vitest run --project browser",
+    "test:watch": "vitest",
+    "bench": "vitest bench --run",
+    "size": "tsx scripts/size.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "@codemirror/autocomplete": "^6.20.0",
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/lang-markdown": "^6.3.0",
+    "@codemirror/lang-yaml": "^6.1.0",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/lint": "^6.8.0",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.0",
+    "@lezer/common": "^1.2.0",
+    "@lezer/highlight": "^1.2.0",
+    "@lezer/markdown": "^1.4.0",
+    "rangi": ">=2.0.0",
+    "shiki": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "rangi": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@codemirror/autocomplete": "^6.20.3",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/lang-yaml": "^6.1.3",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.13",
+    "@lezer/common": "^1.5.3",
+    "@lezer/highlight": "^1.2.4",
+    "@lezer/markdown": "^1.7.2",
+    "@types/node": "catalog:",
+    "@vitest/browser": "^4.1.4",
+    "@vitest/browser-playwright": "^4.1.4",
+    "comark": "catalog:",
+    "esbuild": "^0.28.2",
+    "fast-check": "^4.3.0",
+    "playwright": "^1.55.0",
+    "rangi": "catalog:",
+    "release-it": "catalog:",
+    "shiki": "^4.0.0",
+    "tsdown": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "pnpm typecheck",
+        "pnpm test"
+      ]
+    },
+    "git": {
+      "commitMessage": "chore(release): ${npm.name}@${version}",
+      "tagName": "${npm.name}@${version}",
+      "requireBranch": "main",
+      "requireCleanWorkingDir": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "${npm.name}@${version}"
+    },
+    "npm": {
+      "publish": true
+    }
+  }
+}

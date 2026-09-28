@@ -1,0 +1,5 @@
+.vitest-attachments
+docs/.nuxt
+docs/.output
+docs/.data
+test/browser/__screenshots__
