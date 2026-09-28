@@ -13,7 +13,7 @@ Two forms are supported:
 
 ![npm version](https://img.shields.io/npm/v/comark-kv?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-kv?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-kv — KV for Comark](playground/public/og.png)
+![comark-kv — KV for Comark](docs/public/og.png)
 
 ## Install
 

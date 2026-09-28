@@ -6,7 +6,7 @@ Turn a ` ```arrow ` fence (or `::arrow`) into a live, interactive widget — wit
 
 ![npm version](https://img.shields.io/npm/v/comark-arrow?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-arrow?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-arrow — ArrowJS sandboxes for Comark](playground/public/og.png)
+![comark-arrow — ArrowJS sandboxes for Comark](docs/public/og.png)
 
 ## Install
 
@@ -136,7 +136,7 @@ optimizeDeps: {
 ```bash
 pnpm install
 pnpm play       # tsx playground against the plugin
-pnpm play:nuxt  # Nuxt docs + playground site
+pnpm docs       # Docus site (playground at /play)
 pnpm test
 pnpm build
 ```

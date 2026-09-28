@@ -33,11 +33,9 @@ jobs:
         run: |
           mkdir -p _site
           cp pages/index.html _site/index.html
-          for name in comark-arrow comark-etiket comark-flint-chart comark-kv comark-vega comark-email comark-pdf; do
-            cp -R "packages/${name}/playground/.output/public" "_site/${name}"
+          for name in comark-arrow comark-codemirror comark-etiket comark-flint-chart comark-kv comark-vega comark-email comark-pdf; do
+            cp -R "packages/${name}/docs/.output/public" "_site/${name}"
           done
-          # comark-codemirror's site is its Docus docs (the playground is at /play)
-          cp -R "packages/comark-codemirror/docs/.output/public" "_site/comark-codemirror"
 
       - uses: actions/upload-pages-artifact@v3
         with:

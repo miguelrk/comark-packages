@@ -4,7 +4,7 @@ PDF renderer for [Comark](https://comark.dev). Convert Markdown to print-ready P
 
 ![npm version](https://img.shields.io/npm/v/comark-pdf?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-pdf?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-pdf — PDF renderer for Comark](playground/public/og.png)
+![comark-pdf — PDF renderer for Comark](docs/public/og.png)
 
 ## Install
 
@@ -288,7 +288,7 @@ const bytes = await renderPdf(markdown, {
 pnpm install
 pnpm test
 pnpm play
-pnpm play:nuxt
+pnpm docs
 pnpm build
 ```
 

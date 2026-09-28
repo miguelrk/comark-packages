@@ -1,0 +1,21 @@
+{
+  "name": "comark-email-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "docus": "^5.13.0",
+    "nuxt": "catalog:",
+    "comark-email": "workspace:*",
+    "@comark/html": "catalog:",
+    "@comark/nuxt": "catalog:",
+    "comark": "catalog:",
+    "rangi": "catalog:"
+  }
+}

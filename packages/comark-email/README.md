@@ -4,7 +4,7 @@ Email renderer for Comark. Convert Markdown to responsive, MJML-compiled HTML fo
 
 ![npm version](https://img.shields.io/npm/v/comark-email?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-email?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-email — Email renderer for Comark](playground/public/og.png)
+![comark-email — Email renderer for Comark](docs/public/og.png)
 
 > **Node.js only.** MJML compiles on the server. Do not import `comark-email` in browser-only bundles.
 

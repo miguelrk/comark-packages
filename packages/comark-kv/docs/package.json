@@ -1,0 +1,23 @@
+{
+  "name": "comark-kv-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "docus": "^5.13.0",
+    "nuxt": "catalog:",
+    "comark-kv": "workspace:*",
+    "@comark/nuxt": "catalog:",
+    "@comark/vue": "catalog:",
+    "comark": "catalog:",
+    "rangi": "catalog:",
+    "unstorage": "^1.15.0",
+    "vue": "catalog:"
+  }
+}

@@ -50,6 +50,8 @@
     "dev": "tsdown --watch",
     "play": "tsx playground/index.ts",
     "play:nuxt": "pnpm --filter comark-etiket-playground dev",
+    "docs": "pnpm --filter comark-etiket-docs dev",
+    "docs:generate": "pnpm --filter comark-etiket-docs generate",
     "og:generate": "pnpm --filter comark-etiket-playground og:generate",
     "prepack": "npm run build",
     "release": "release-it",

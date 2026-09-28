@@ -36,7 +36,8 @@ pnpm add <package>
 - `pnpm --dir packages/<package> build`
 - `pnpm --dir packages/<package> dev`
 - `pnpm --dir packages/<package> play`
-- `pnpm --dir packages/<package> play:nuxt`
+- `pnpm --dir packages/<package> docs`
+- `pnpm --dir packages/<package> docs:generate`
 - `pnpm --dir packages/<package> og:generate`
 - `pnpm --dir packages/<package> release`
 - `pnpm --dir packages/<package> test`

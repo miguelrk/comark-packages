@@ -58,6 +58,8 @@
     "dev": "tsdown --watch",
     "play": "tsx playground/index.ts",
     "play:nuxt": "pnpm --filter comark-kv-playground dev",
+    "docs": "pnpm --filter comark-kv-docs dev",
+    "docs:generate": "pnpm --filter comark-kv-docs generate",
     "og:generate": "pnpm --filter comark-kv-playground og:generate",
     "prepack": "npm run build",
     "release": "release-it",

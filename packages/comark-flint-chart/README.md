@@ -6,7 +6,7 @@ Ships a Vue renderer; parse-time SVG/img is an **opt-in** for static docs.
 
 ![npm version](https://img.shields.io/npm/v/comark-flint-chart?style=flat&colorA=18181B&colorB=F0DB4F) ![npm downloads](https://img.shields.io/npm/dm/comark-flint-chart?style=flat&colorA=18181B&colorB=F0DB4F) ![CI](https://img.shields.io/github/actions/workflow/status/miguelrk/comark-packages/ci.yml?branch=main&style=flat&colorA=18181B&colorB=F0DB4F) ![license](https://img.shields.io/github/license/miguelrk/comark-packages?style=flat&colorA=18181B&colorB=F0DB4F)
 
-![comark-flint-chart — Flint charts for Comark](playground/public/og.png)
+![comark-flint-chart — Flint charts for Comark](docs/public/og.png)
 
 ## Install
 
