@@ -13,6 +13,11 @@ import { diagnose } from 'comark-codemirror'
 import { llms, tools as agentTools } from 'comark-codemirror/agent'
 import { DEMO_DATA, DEMO_OPTIONS, DEMOS, TOUR } from '~/utils/demos'
 
+definePageMeta({
+  layout: 'default',
+  footer: false,
+})
+
 useSeoMeta({ title: 'Playground', description: 'Try comark-codemirror: chained autocomplete for every Comark construct, with a live preview and the agent tools.' })
 
 const route = useRoute()

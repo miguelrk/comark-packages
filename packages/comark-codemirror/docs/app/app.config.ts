@@ -10,12 +10,9 @@ export default defineAppConfig({
     title: 'comark-codemirror',
   },
   github: {
-    url: 'https://github.com/miguelrk/comark-packages',
+    url: 'https://github.com/miguelrk/comark-packages/tree/main/packages/comark-codemirror',
     branch: 'main',
-    rootDir: 'packages/comark-codemirror/docs',
-  },
-  socials: {
-    github: 'https://github.com/miguelrk/comark-packages',
+    rootDir: 'docs',
   },
   toc: {
     title: 'On this page',
