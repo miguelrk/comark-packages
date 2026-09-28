@@ -36,7 +36,8 @@ A [Comark](https://comark.dev) plugin for [ArrowJS](https://arrow-js.com). Turn 
   :::
 
 #default
-  ![comark-arrow — ArrowJS sandboxes for Comark](/og.png)
+  ::og-image{alt="comark-arrow — ArrowJS sandboxes for Comark"}
+  ::
 ::
 
 ::u-page-section

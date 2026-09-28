@@ -36,7 +36,8 @@ A [Comark](https://comark.dev) plugin for [Flint](https://github.com/microsoft/f
   :::
 
 #default
-  ![comark-flint-chart — Flint charts for Comark](/og.png){.rounded-lg.border.border-default}
+  ::og-image{alt="comark-flint-chart — Flint charts for Comark"}
+  ::
 ::
 
 ::u-page-section

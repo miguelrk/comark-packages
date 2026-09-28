@@ -36,7 +36,8 @@ A [Comark](https://comark.dev) plugin for [Vega](https://vega.github.io/vega/) a
   :::
 
 #default
-  ![comark-vega — Vega charts for Comark](/og.png)
+  ::og-image{alt="comark-vega — Vega charts for Comark"}
+  ::
 ::
 
 ::u-page-section

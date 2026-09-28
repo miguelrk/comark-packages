@@ -269,6 +269,27 @@ ${aliasBlock}
   const ogDst = join(docsDir, 'public/og.png')
   if (existsSync(ogSrc)) cpSync(ogSrc, ogDst)
 
+  mkdirSync(join(docsDir, 'app/components/content'), { recursive: true })
+  writeFileSync(join(docsDir, 'app/components/content/OgImage.vue'), `<script setup lang="ts">
+import { withBase } from 'ufo'
+
+defineProps<{
+  alt: string
+}>()
+
+const { app: { baseURL } } = useRuntimeConfig()
+const src = withBase('/og.png', baseURL)
+</script>
+
+<template>
+  <img
+    :src="src"
+    :alt="alt"
+    class="h-auto w-full max-w-full rounded-lg border border-default"
+  >
+</template>
+`)
+
   if (pkg.hasPlay) {
     mkdirSync(join(docsDir, 'app/pages'), { recursive: true })
     const playSrc = join(packagesDir, pkg.name, 'playground/app/pages/play.vue')

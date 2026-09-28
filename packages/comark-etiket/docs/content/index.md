@@ -36,7 +36,8 @@ A [Comark](https://comark.dev) plugin for [etiket](https://github.com/productdev
   :::
 
 #default
-  ![comark-etiket — barcode and QR codes for Comark](/og.png){.rounded-lg.border.border-default}
+  ::og-image{alt="comark-etiket — barcode and QR codes for Comark"}
+  ::
 ::
 
 ::u-page-section

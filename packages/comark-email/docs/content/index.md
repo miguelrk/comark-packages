@@ -36,7 +36,8 @@ Email renderer for [Comark](https://comark.dev). Turn Markdown into responsive, 
   :::
 
 #default
-  ![comark-email — Email renderer for Comark](/og.png)
+  ::og-image{alt="comark-email — Email renderer for Comark"}
+  ::
 ::
 
 ::u-page-section

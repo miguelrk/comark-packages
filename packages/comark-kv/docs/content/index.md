@@ -36,7 +36,8 @@ A [Comark](https://comark.dev) plugin that declares a `kv:` block in frontmatter
   :::
 
 #default
-  ![comark-kv — KV for Comark](/og.png)
+  ::og-image{alt="comark-kv — KV for Comark"}
+  ::
 ::
 
 ::u-page-section

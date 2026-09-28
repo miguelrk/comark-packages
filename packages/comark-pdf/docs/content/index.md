@@ -36,7 +36,8 @@ PDF renderer for [Comark](https://comark.dev). Convert Markdown to PDF bytes via
   :::
 
 #default
-  ![comark-pdf — PDF renderer for Comark](/og.png)
+  ::og-image{alt="comark-pdf — PDF renderer for Comark"}
+  ::
 ::
 
 ::u-page-section
