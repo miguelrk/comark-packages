@@ -135,4 +135,9 @@ export interface PdfRendererOptions extends ParserOptions {
   fonts?: Record<string, PdfFontFaces>
   onMissingGlyphs?: (chars: string[]) => void
   data?: Record<string, unknown>
+  /**
+   * Render the body once per entry, with a page break between entries.
+   * Each entry is merged over `data` (entry keys win).
+   */
+  each?: Record<string, unknown>[]
 }

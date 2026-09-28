@@ -2,7 +2,7 @@ import type { ElementNode, MarkdownDocument } from 'comark'
 import { parseMarkdown } from 'comark'
 import { render } from 'comark/render'
 import { describe, expect, it, vi } from 'vitest'
-import etiket, { attrsToOpts, coerceValue } from '../src/index.ts'
+import etiket, { attrsToOpts, coerceValue, etiketTags, renderEtiketSvg } from '../src/index.ts'
 
 const renderHtml = async (tree: MarkdownDocument) =>
   (await render(tree, { blockSeparator: '\n', format: 'text/html' })).trim()
@@ -266,5 +266,34 @@ etiket:
     // Both should produce svg nodes
     const svgCount = nodes.filter((n) => Array.isArray(n) && n[0] === 'svg').length
     expect(svgCount).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('renderEtiketSvg', () => {
+  it('lists every directive tag', () => {
+    for (const tag of ['qrcode', 'barcode', 'datamatrix', 'qr-wifi', 'qr-sheet']) {
+      expect(etiketTags.has(tag)).toBe(true)
+    }
+  })
+
+  it('renders a resolved value to an SVG string', async () => {
+    const svg = await renderEtiketSvg('qrcode', { value: 'netzo:v1:item:1', 'ec-level': 'M' })
+    expect(svg).toMatch(/^<svg/)
+  })
+
+  it('renders a 1D barcode with a numeric value', async () => {
+    const svg = await renderEtiketSvg('barcode', { value: 12345678, type: 'code128' })
+    expect(svg).toMatch(/^<svg/)
+  })
+
+  it('applies per-tag defaults', async () => {
+    const plain = await renderEtiketSvg('qrcode', { value: 'x' })
+    const colored = await renderEtiketSvg('qrcode', { value: 'x' }, { defaults: { qrcode: { color: '#ff0000' } } })
+    expect(colored).not.toBe(plain)
+    expect(colored).toContain('#ff0000')
+  })
+
+  it('returns undefined for an unresolved bound value', async () => {
+    expect(await renderEtiketSvg('qrcode', { ':value': 'data.qr' })).toBeUndefined()
   })
 })

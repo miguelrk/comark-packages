@@ -1,4 +1,4 @@
-import { Document, Page, Column, renderToBytes } from '@jasy/pdf'
+import { Document, Page, PageBreak, Column, renderToBytes } from '@jasy/pdf'
 import type { JasyDocument, PageOptions, PDFElement, RenderOptions } from '@jasy/pdf'
 import { createMarkdownParser } from 'comark'
 import type { MarkdownDocument } from 'comark'
@@ -47,18 +47,27 @@ export const renderPdfDocument = async (
     ...options,
     plugins: [binding(), ...(options?.plugins ?? [])],
   })
-  const nodes = await astToJasy(
+  const mapBody = (data?: Record<string, unknown>) => astToJasy(
     document.nodes,
     { ...pdfBindingComponents, ...options?.components },
     textDefaults,
     options?.visuals,
     {
-      data: options?.data,
+      data,
       frontmatter: (document as MarkdownDocument).frontmatter,
       parseMarkdown,
     },
   )
-  const content = nodes.length > 0 ? nodes : []
+  const content: PDFElement[] = []
+  if (options?.each) {
+    for (const [index, entry] of options.each.entries()) {
+      if (index > 0) content.push(PageBreak())
+      content.push(...await mapBody({ ...options.data, ...entry }))
+    }
+  }
+  else {
+    content.push(...await mapBody(options?.data))
+  }
   const chrome = resolvePageChrome(pdfConfig, options?.chrome)
   const body: PDFElement[] = [Column({ gap }, content)]
   if (chrome.watermark) body.unshift(chrome.watermark)

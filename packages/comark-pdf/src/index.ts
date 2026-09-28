@@ -22,6 +22,7 @@ export type {
   PdfVisuals,
 } from './types.ts'
 export type { JasyComponentFn, JasyMapContext, JasyTextDefaults } from './jasy.ts'
+export { sanitizeSvgLengths } from './jasy.ts'
 export {
   pdfConfigToPageProps,
   pdfConfigToDocumentOptions,

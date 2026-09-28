@@ -261,6 +261,24 @@ describe('binding', () => {
     expect(isPdf(bytes)).toBe(true)
   })
 
+  it('renders the body once per `each` entry, one page each', async () => {
+    const pageCount = (bytes: Uint8Array) =>
+      new TextDecoder('latin1').decode(bytes).match(/\/Type\s*\/Page(?!s)/g)?.length ?? 0
+    const markdown = '# {{ data.row.code }}\n\n{{ data.shared }}'
+    const single = await renderPdf(markdown, {
+      pdf: { width: '50mm', height: '50mm' },
+      data: { shared: 'Org', row: { code: 'A' } },
+    })
+    const batch = await renderPdf(markdown, {
+      pdf: { width: '50mm', height: '50mm' },
+      data: { shared: 'Org' },
+      each: [{ row: { code: 'A' } }, { row: { code: 'B' } }, { row: { code: 'C' } }],
+    })
+    expect(isPdf(batch)).toBe(true)
+    expect(pageCount(single)).toBe(1)
+    expect(pageCount(batch)).toBe(3)
+  })
+
   it('uses || as a literal default', () => {
     const scope = { data: { tradeName: { es: 'Graficoat', en: '' } } }
     expect(interpolateBindings('{{ data.tradeName.es }}', scope)).toBe('Graficoat')

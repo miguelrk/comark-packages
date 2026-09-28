@@ -238,6 +238,20 @@ The plugin performs soft validation where possible (`validateBarcode`, `validate
 
 Attributes with a `:key` prefix that are runtime binding expressions (e.g. `:value="user.profileUrl"`) cannot be resolved at parse time. Those directive nodes are left unchanged in the AST.
 
+A renderer that resolves bindings itself can render those nodes later with `renderEtiketSvg`. It takes resolved attrs and returns an SVG string. `etiketTags` lists every tag that the package renders.
+
+```ts
+import { etiketTags, renderEtiketSvg } from 'comark-etiket'
+
+if (etiketTags.has(tag)) {
+  const svg = await renderEtiketSvg(tag, { value: 'netzo:v1:item:42', 'ec-level': 'M' }, {
+    defaults: frontmatter.etiket, // per-tag objects override global keys
+  })
+}
+```
+
+`renderEtiketSvg` returns `undefined` when etiket is not installed, the tag is unknown, or the value is empty. It throws when etiket rejects the value. PDF hosts (for example Netzo) pass jasy components that call `renderEtiketSvg` via `renderPdf({ components })`. comark-pdf does not depend on this package.
+
 ## Credits
 
 Barcode and QR generation is provided by [etiket](https://github.com/productdevbook/etiket) ([MIT](https://github.com/productdevbook/etiket/blob/main/LICENSE)), maintained by [productdevbook](https://github.com/productdevbook). This plugin wraps that library for use with [Comark](https://comark.dev); it does not reimplement the encoders.

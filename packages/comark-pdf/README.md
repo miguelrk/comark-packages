@@ -95,6 +95,16 @@ Do not use `::kv`. Write labels in the locale file (GFM tables, `::if`, `::for`)
 | `plugins` | `ComarkPlugin[]` | Parser plugins (math, mermaid, binding, …) |
 | `components` | `Record<string, JasyComponentFn>` | Custom jasy component factories by tag name |
 | `fonts` | `Record<string, Uint8Array \| FontFaces>` | Font paths or bytes; registered with `addFont` |
+| `data` | `Record<string, unknown>` | Binding data for `{{ }}`, `:attr`, `::if`, `::for` |
+| `each` | `Record<string, unknown>[]` | Render the body once per entry, with a page break between entries. Each entry is merged over `data`. Use it for label batches (one label per page). |
+
+```ts
+const bytes = await renderPdf('# {{ data.row.code }}', {
+  pdf: { width: '50.8mm', height: '50.8mm', margin: '2mm' },
+  data: { organization: 'Acme' },
+  each: rows.map(row => ({ row })),
+})
+```
 
 Also accepts Comark `ParserOptions` (`autoClose`, `linkify`, `registerDefaultPlugins`, …).
 
@@ -240,14 +250,32 @@ const bytes = await renderPdf(markdown, {
 
 ## Custom components
 
-Override any Comark component tag with a jasy element factory:
+Override any Comark component tag with a jasy element factory. Pass host-owned factories for barcodes, charts, or other optional features — comark-pdf does not depend on `comark-etiket` or `etiket`.
 
 ```ts
-import { renderPdf } from 'comark-pdf'
-import { Box, Text } from '@jasy/pdf'
+import { renderPdf, parseLengthToPt, sanitizeSvgLengths } from 'comark-pdf'
+import { Box, Svg, Text } from '@jasy/pdf'
+import { etiketTags, renderEtiketSvg } from 'comark-etiket'
+
+const etiketComponents = Object.fromEntries(
+  [...etiketTags].map(tag => [
+    tag,
+    async ([directiveTag, rawAttrs], ctx) => {
+      const attrs = ctx.resolveAttrs(rawAttrs)
+      const svg = await renderEtiketSvg(String(directiveTag), attrs, {
+        defaults: ctx.frontmatter?.etiket as Record<string, unknown> | undefined,
+      })
+      if (!svg) return null
+      return Svg(sanitizeSvgLengths(svg), {
+        width: typeof attrs.size === 'string' ? parseLengthToPt(attrs.size) : undefined,
+      })
+    },
+  ]),
+)
 
 const bytes = await renderPdf(markdown, {
   components: {
+    ...etiketComponents,
     alert: ([, attrs, ...children], ctx) =>
       Box({ bg: '#fff3cd', padding: 12, radius: 4 }, ctx.mapNodes(children)),
   },

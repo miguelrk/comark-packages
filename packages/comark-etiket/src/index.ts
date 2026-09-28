@@ -191,6 +191,7 @@ export const attrsToOpts = (attrs: Record<string, unknown>): Record<string, unkn
 
 const getDirectiveValue = (attrs: Record<string, unknown>, children: Node[]): string | undefined => {
   if (typeof attrs.value === 'string' && attrs.value.length > 0) return attrs.value
+  if (typeof attrs.value === 'number' || typeof attrs.value === 'bigint') return String(attrs.value)
   const text = children.map((c) => textContent(c)).join('').trim()
   return text.length > 0 ? text : undefined
 }
@@ -321,46 +322,29 @@ const inlineSvgNode = (svg: string): ElementNode | undefined => {
   return nodes.length > 0 ? (nodes[0] as ElementNode) : undefined
 }
 
-const generate = (
-  mod: EtiketModule,
+type EtiketCall = { fn: string; args: unknown[]; value?: string; opts?: Record<string, unknown> }
+
+/** Resolve the etiket function and arguments for one directive. `value` is set for standard 1D/2D tags only. */
+const prepareCall = (
   tag: string,
   attrs: Record<string, unknown>,
   children: Node[],
   defaults: Record<string, unknown>,
-  output: EtiketOutput,
-): Node | undefined => {
-  // -----------------------------------------------------------------------
+): EtiketCall | undefined => {
   // Batch: ::barcode-sheet, ::qr-sheet
-  // -----------------------------------------------------------------------
   if (tag in BATCH_FN) {
     const values = getDirectiveBatch(attrs, children)
-    const opts = { ...defaults, ...attrsToOpts(attrs) }
     if (values.length === 0) {
       console.warn(`[comark-etiket] ${tag} has no values — provide them as child lines or values= attr`)
       return undefined
     }
-    const svg = callFn(mod, BATCH_FN[tag]!, [values, opts])
-    return output === 'png' || output === 'img'
-      ? makeImgNode(svgToDataURI(svg), `etiket-${tag}`)
-      : inlineSvgNode(svg)
+    return { fn: BATCH_FN[tag]!, args: [values, { ...defaults, ...attrsToOpts(attrs) }] }
   }
 
-  // -----------------------------------------------------------------------
   // Helpers: ::qr-wifi, ::qr-vcard, etc.
-  // -----------------------------------------------------------------------
-  if (HELPER_TAGS.has(tag)) {
-    const allOpts = { ...defaults, ...attrsToOpts(attrs) }
-    const { fn, args } = buildHelperArgs(tag, allOpts)
-    const svg = callFn(mod, fn, args)
-    if (output === 'png' || output === 'img') {
-      return makeImgNode(svgToDataURI(svg), `etiket-${tag}`)
-    }
-    return inlineSvgNode(svg)
-  }
+  if (HELPER_TAGS.has(tag)) return buildHelperArgs(tag, { ...defaults, ...attrsToOpts(attrs) })
 
-  // -----------------------------------------------------------------------
   // Standard 1D/2D: ::qrcode, ::barcode, ::datamatrix, etc.
-  // -----------------------------------------------------------------------
   const svgFn = SVG_FN[tag]
   if (!svgFn) return undefined
 
@@ -373,8 +357,11 @@ const generate = (
   }
 
   const opts = { ...defaults, ...attrsToOpts(attrs) }
+  return { fn: svgFn, args: [value, opts], value, opts }
+}
 
-  // Soft validation — warn but still attempt generation
+/** Soft validation — warn but still attempt generation. */
+const softValidate = (mod: EtiketModule, tag: string, value: string, opts: Record<string, unknown>): void => {
   try {
     if ((tag === 'qrcode' || tag === 'microqr' || tag === 'rmqr') && typeof mod.validateQRInput === 'function') {
       const res = mod.validateQRInput(value) as { valid?: boolean; error?: string } | undefined
@@ -388,36 +375,47 @@ const generate = (
       }
     }
   } catch { /* soft validation must never throw */ }
+}
 
-  // For PNG output — use the dedicated PNG data-URI function
-  if (output === 'png') {
-    const pngFn = PNG_URI_FN[tag]
-    if (pngFn && typeof mod[pngFn] === 'function') {
-      const dataUri = callFn(mod, pngFn, [value, opts])
-      return makeImgNode(dataUri, value)
+/** Merge per-tag defaults (e.g. `etiket.qrcode.ecLevel`) over the global defaults. */
+const resolveTagDefaults = (tag: string, defaults: Record<string, unknown>): Record<string, unknown> => {
+  const perTag = defaults[tag]
+  return perTag !== null && typeof perTag === 'object'
+    ? { ...defaults, ...(perTag as Record<string, unknown>) }
+    : defaults
+}
+
+const generate = (
+  mod: EtiketModule,
+  tag: string,
+  attrs: Record<string, unknown>,
+  children: Node[],
+  defaults: Record<string, unknown>,
+  output: EtiketOutput,
+): Node | undefined => {
+  const call = prepareCall(tag, attrs, children, defaults)
+  if (!call) return undefined
+
+  if (call.value !== undefined) {
+    softValidate(mod, tag, call.value, call.opts ?? {})
+
+    // For PNG output — use the dedicated PNG data-URI function
+    if (output === 'png') {
+      const pngFn = PNG_URI_FN[tag]
+      if (pngFn && typeof mod[pngFn] === 'function') return makeImgNode(callFn(mod, pngFn, call.args), call.value)
+      console.warn(`[comark-etiket] output=png not supported for ${tag}; using SVG data URI`)
     }
-    console.warn(`[comark-etiket] output=png not supported for ${tag}; using SVG data URI`)
-    // fall through to SVG
-  }
 
-  // Generate SVG string (shared by svg / img / fallback png)
-  const svg = callFn(mod, svgFn, [value, opts])
-
-  if (output === 'img') {
-    const dataUriFn = DATA_URI_FN[tag]
-    if (dataUriFn && typeof mod[dataUriFn] === 'function') {
-      const dataUri = callFn(mod, dataUriFn, [value, opts])
-      return makeImgNode(dataUri, value)
+    if (output === 'img') {
+      const dataUriFn = DATA_URI_FN[tag]
+      if (dataUriFn && typeof mod[dataUriFn] === 'function') return makeImgNode(callFn(mod, dataUriFn, call.args), call.value)
     }
-    return makeImgNode(svgToDataURI(svg), value)
   }
 
-  if (output === 'png') {
-    return makeImgNode(svgToDataURI(svg), value)
-  }
-
-  // Default: inline SVG
-  return inlineSvgNode(svg)
+  const svg = callFn(mod, call.fn, call.args)
+  return output === 'png' || output === 'img'
+    ? makeImgNode(svgToDataURI(svg), call.value ?? `etiket-${tag}`)
+    : inlineSvgNode(svg)
 }
 
 // ---------------------------------------------------------------------------
@@ -440,6 +438,38 @@ const loadEtiket = async (): Promise<EtiketModule | null> => {
     )
     return null
   }
+}
+
+// ---------------------------------------------------------------------------
+// Render-time API (hosts that resolve bound attrs themselves, e.g. comark-pdf)
+// ---------------------------------------------------------------------------
+
+/** Every directive tag this package renders. */
+export const etiketTags: ReadonlySet<string> = ALL_TAGS
+
+export interface RenderEtiketSvgOptions {
+  /** Directive children; inline text is the value when `value` is not set. */
+  children?: Node[]
+  /** Frontmatter-style defaults. Per-tag objects (e.g. `qrcode: { ecLevel: 'H' }`) override global keys. */
+  defaults?: Record<string, unknown>
+}
+
+/**
+ * Render one etiket directive to an SVG string from already-resolved attrs.
+ * Returns `undefined` when etiket is not installed, the tag is unknown, or the value is empty.
+ * Throws when etiket rejects the value.
+ */
+export const renderEtiketSvg = async (
+  tag: string,
+  attrs: Record<string, unknown>,
+  options: RenderEtiketSvgOptions = {},
+): Promise<string | undefined> => {
+  const mod = await loadEtiket()
+  if (!mod) return undefined
+  const call = prepareCall(tag, attrs, options.children ?? [], resolveTagDefaults(tag, options.defaults ?? {}))
+  if (!call) return undefined
+  if (call.value !== undefined) softValidate(mod, tag, call.value, call.opts ?? {})
+  return callFn(mod, call.fn, call.args)
 }
 
 // ---------------------------------------------------------------------------
@@ -494,16 +524,8 @@ const plugin: ComarkPluginFactory<EtiketConfig> = defineComarkPlugin<EtiketConfi
 
         const output = String(attrs.output ?? globalDefaults.output ?? outputDefault) as EtiketOutput
 
-        // Per-tag frontmatter overrides (e.g. frontmatter.etiket.qrcode.ecLevel)
-        const perTagDefaults =
-          globalDefaults[tag] !== null && typeof globalDefaults[tag] === 'object'
-            ? (globalDefaults[tag] as Record<string, unknown>)
-            : {}
-        const mergedDefaults = { ...globalDefaults, ...perTagDefaults }
-
         try {
-          const result = generate(mod, tag, attrs, children, mergedDefaults, output)
-          return result
+          return generate(mod, tag, attrs, children, resolveTagDefaults(tag, globalDefaults), output)
         } catch (err) {
           console.warn(
             `[comark-etiket] Failed to generate ${tag}: ${err instanceof Error ? err.message : String(err)}`,
