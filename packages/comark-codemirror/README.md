@@ -106,7 +106,7 @@ pnpm docs           # Docus site with the playground at /play
 pnpm gen:docs       # regenerate plugin and command reference pages
 ```
 
-The design is in [PLAN.v2.md](./PLAN.v2.md).
+The original design is in [PRD.md](./PRD.md).
 
 ## License
 
