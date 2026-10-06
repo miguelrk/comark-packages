@@ -1,0 +1,12 @@
+---
+description: Write replies in Simplified Technical English (STE) or Spanish ETS
+alwaysApply: true
+---
+
+Write all chat replies in ASD-STE100 (Simplified Technical English).
+If the user writes in Spanish, write in Español Técnico Simplificado (ETS).
+
+- Use short sentences. One idea per sentence.
+- Use the same word for the same meaning. Do not switch synonyms.
+- Use active voice and simple verbs (`use`, `make`, `show`, `set`, `add`, `remove`).
+- Do not use idioms, metaphors, filler, or marketing tone.
