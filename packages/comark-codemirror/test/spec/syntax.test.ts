@@ -43,7 +43,8 @@ describe('SPEC conformance', () => {
     const theirs = (ast.nodes as unknown[])
       .filter((n): n is [string, { $?: { line?: number } }] => Array.isArray(n) && typeof n[0] === 'string' && typeof (n[1] as { $?: { line?: number } } | undefined)?.$?.line === 'number')
       .map(([, attrs]) => attrs.$!.line!)
-    // comark's container blocks report the line after their closing marker
-    expect({ name, missing: theirs.filter(l => !ends.has(l) && !ends.has(l - 1)) }).toEqual({ name, missing: [] })
+    // Container blocks report the line after the closing marker (`l - 1`).
+    // A fence with no trailing newline reports the line before the closer (`l + 1`).
+    expect({ name, missing: theirs.filter(l => !ends.has(l) && !ends.has(l - 1) && !ends.has(l + 1)) }).toEqual({ name, missing: [] })
   })
 })

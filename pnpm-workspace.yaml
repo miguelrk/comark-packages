@@ -10,10 +10,10 @@ catalog:
   tsx: ^4.22.4
   release-it: ^21.0.3
   '@types/node': ^22.10.0
-  comark: ^0.7.0
-  '@comark/nuxt': ^0.7.0
-  '@comark/html': ^0.7.0
-  '@comark/vue': ^0.7.0
+  comark: ^0.8.0
+  '@comark/nuxt': ^0.8.0
+  '@comark/html': ^0.8.0
+  '@comark/vue': ^0.8.0
   vue: ^3.5.0
   '@vue/test-utils': ^2.4.6
   nuxt: ^4.5.2
@@ -35,3 +35,9 @@ tasks:
 
 pipelines:
   generate: [generate]
+
+minimumReleaseAgeExclude:
+  - '@comark/html@0.8.0'
+  - '@comark/nuxt@0.8.0'
+  - '@comark/vue@0.8.0'
+  - comark@0.8.0
