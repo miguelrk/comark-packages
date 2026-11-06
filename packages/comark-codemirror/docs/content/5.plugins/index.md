@@ -16,7 +16,7 @@ import { presetEcosystem } from 'comark-codemirror/presets/ecosystem'
 comark({ plugins: [...presetBuiltins(), ...presetEcosystem(), mermaid()] })
 ```
 
-- **Defaults** are registered automatically (like comark): alert, attributes, components, frontmatter, html, task-list. Disable with `registerDefaultPlugins: false`.
+- **Defaults** are registered automatically: alert, attributes, components, frontmatter, html, task-list. Disable with `registerDefaultPlugins: false`. comark's parser also registers `linkify` by default. This editor has no linkify plugin.
 - **Built-ins**: `presetBuiltins()` or one by one from `comark-codemirror/plugins/<name>`.
 - **Ecosystem** (comark-packages): `presetEcosystem()`.
 - A later plugin with the same name replaces an earlier one; `enforce: 'pre' | 'post'` orders them.

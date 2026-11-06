@@ -278,7 +278,7 @@ export interface LinkTarget {
 export interface ComarkOptions {
   /** Editor plugins. A plugin replaces an earlier one with the same name. */
   plugins?: readonly EditorPlugin[]
-  /** Register comark's default plugins (alert, attributes, components, frontmatter, html, task-list). @default true */
+  /** Register the editor default plugins (alert, attributes, components, frontmatter, html, task-list). comark's parser also defaults linkify; this editor has no linkify plugin. @default true */
   registerDefaultPlugins?: boolean
   /** Component manifest (merged after plugin manifests; later wins). */
   components?: readonly ComponentDef[]

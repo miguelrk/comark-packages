@@ -106,7 +106,7 @@ const bytes = await renderPdf('# {{ data.row.code }}', {
 })
 ```
 
-Also accepts Comark `ParserOptions` (`autoClose`, `linkify`, `registerDefaultPlugins`, …).
+Also accepts Comark `ParserOptions` (`autoClose`, `registerDefaultPlugins`, …). Autolinks come from the default `linkify` plugin.
 
 Merge order for page config (last write wins): `frontmatter.pdf` → `options.pdf`.
 

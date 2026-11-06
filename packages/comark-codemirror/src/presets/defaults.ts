@@ -1,5 +1,6 @@
 /**
- * comark's default plugins, registered unless `registerDefaultPlugins: false`.
+ * Editor plugins registered unless `registerDefaultPlugins: false`.
+ * comark's parser also registers `linkify` by default. This editor has no linkify plugin.
  */
 import type { EditorPlugin } from '../types.ts'
 import alert from '../plugins/alert.ts'

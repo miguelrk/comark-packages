@@ -72,7 +72,7 @@ Roots match what comark renderers resolve: `frontmatter` (parsed live from the d
 
 ## Plugins
 
-comark's defaults are registered automatically (alert, attributes, components, frontmatter, html, task-list). Built-ins (`comark-codemirror/presets/builtins`) and ecosystem plugins (`comark-codemirror/presets/ecosystem`: etiket, email, flint, page-break, vega) add components, snippets, scopes, lint and commands. Write your own with `definePlugin`.
+Editor defaults are registered automatically (alert, attributes, components, frontmatter, html, task-list). comark's parser also registers `linkify` by default. This editor has no linkify plugin. Built-ins (`comark-codemirror/presets/builtins`) and ecosystem plugins (`comark-codemirror/presets/ecosystem`: etiket, email, flint, page-break, vega) add components, snippets, scopes, lint and commands. Write your own with `definePlugin`.
 
 ## Agents
 
