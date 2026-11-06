@@ -10,13 +10,13 @@ catalog:
   tsx: ^4.22.4
   release-it: ^21.0.3
   '@types/node': ^22.10.0
-  comark: ^0.8.0
-  '@comark/nuxt': ^0.8.0
-  '@comark/html': ^0.8.0
-  '@comark/vue': ^0.8.0
-  vue: ^3.5.0
+  comark: ^0.9.0
+  '@comark/nuxt': ^0.9.0
+  '@comark/html': ^0.9.0
+  '@comark/vue': ^0.9.0
+  vue: ^3.5.43
   '@vue/test-utils': ^2.4.6
-  nuxt: ^4.5.2
+  nuxt: ^4.6.4
   rangi: ^2.2.0
   htmlparser2: ^12.0.0
 
@@ -37,7 +37,13 @@ pipelines:
   generate: [generate]
 
 minimumReleaseAgeExclude:
-  - '@comark/html@0.8.0'
-  - '@comark/nuxt@0.8.0'
-  - '@comark/vue@0.8.0'
-  - comark@0.8.0
+  - '@comark/html@0.9.0'
+  - '@comark/nuxt@0.9.0'
+  - '@comark/vue@0.9.0'
+  - comark@0.9.0
+  - shiki@4.6.0
+  - vite@8.3.6
+
+overrides:
+  shiki: 4.6.0
+  vite: 8.3.6

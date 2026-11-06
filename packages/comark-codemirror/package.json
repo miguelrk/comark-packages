@@ -91,7 +91,7 @@
     "@lezer/highlight": "^1.2.0",
     "@lezer/markdown": "^1.4.0",
     "rangi": ">=2.0.0",
-    "shiki": ">=3.0.0"
+    "shiki": "^4.5.0"
   },
   "peerDependenciesMeta": {
     "rangi": {
@@ -122,7 +122,7 @@
     "playwright": "^1.55.0",
     "rangi": "catalog:",
     "release-it": "catalog:",
-    "shiki": "^4.0.0",
+    "shiki": "^4.5.0",
     "tsdown": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
